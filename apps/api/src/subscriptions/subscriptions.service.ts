@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
-import Razorpay from 'razorpay';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Razorpay = require('razorpay');
 import * as crypto from 'crypto';
 
 // Monthly plan: £20 = 2000 pence → Razorpay uses paise (INR) or smallest unit
@@ -32,7 +33,8 @@ const PLANS = {
 @Injectable()
 export class SubscriptionsService {
   private readonly logger = new Logger(SubscriptionsService.name);
-  private razorpay: Razorpay;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private razorpay: any;
 
   constructor(
     private prisma: PrismaService,
