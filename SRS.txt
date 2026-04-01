@@ -1,0 +1,102 @@
+Software Requirements Specification (SRS)
+Project: Golf Charity Subscription Platform [cite: 5]
+
+1. INTRODUCTION
+1.1 Purpose
+This document specifies the software requirements for a subscription-based golf platform that combines performance tracking, monthly prize draws, and charitable giving[cite: 7]. It serves as the single source of truth for the design, development, and evaluation of the system[cite: 9].
+1.2 Background
+This project is a sample assignment issued by Digital Heroes (digitalheroes.co.in) for evaluating full-stack development trainees[cite: 6, 8]. 
+
+2. OVERALL DESCRIPTION
+2.1 Product Perspective
+The platform is a subscription-driven web application[cite: 11]. Users subscribe to the platform, enter their latest golf scores in Stableford format, participate in monthly draws, and support a charity with a portion of their subscription[cite: 14, 15].
+2.2 User Roles
+* Public Visitor: Can view the platform concept, explore listed charities, understand draw mechanics, and initiate a subscription [cite: 23-27]. Non-subscribers receive restricted access to platform features[cite: 41].
+* Registered Subscriber: Can manage their profile and settings, enter or edit golf scores, select a charity recipient, view their participation and winnings, and upload winner proof [cite: 28-33].
+* Administrator: Can manage users and subscriptions, configure and run draws, manage charity listings, verify winners and payouts, and access reports and analytics [cite: 34-39].
+
+3. SYSTEM FEATURES (FUNCTIONAL REQUIREMENTS)
+3.1 Subscription & Payment System
+* The system must support Monthly and Yearly (discounted rate) subscription plans[cite: 41].
+* Payments must be processed via Stripe or an equivalent PCI-compliant provider[cite: 41].
+* The system must handle lifecycle states including renewal, cancellation, and lapsed subscriptions[cite: 41].
+* The system must perform a real-time subscription status check on every authenticated request[cite: 41].
+
+3.2 Score Management System
+* Users must enter their last 5 golf scores[cite: 44].
+* The valid score range is 1-45 in Stableford format[cite: 45].
+* Each score entry must include a date[cite: 46].
+* The system must retain only the latest 5 scores at any given time[cite: 48].
+* A new score automatically replaces the oldest stored score[cite: 49].
+* Scores must be displayed in reverse chronological order[cite: 50].
+
+3.3 Draw & Reward System
+* The system must execute draws once per month[cite: 61].
+* Draw mechanics include 5-Number Match, 4-Number Match, and 3-Number Match [cite: 53-55].
+* Draw logic must support both random generation (standard lottery-style) and algorithmic generation (weighted by most/least frequent user scores) [cite: 57-59].
+* Administrators must have access to a simulation/pre-analysis mode before officially publishing draw results[cite: 62, 63].
+* The system must support a jackpot rollover to the next month if there is no 5-match winner[cite: 63].
+
+3.4 Prize Pool Logic
+* A pre-defined, automatically enforced portion of each subscription must contribute to the prize pool[cite: 69].
+* The prize pool must be auto-calculated based on the active subscriber count[cite: 71].
+* The 5-Number Match tier receives 40% of the pool and acts as a jackpot that carries forward if unclaimed[cite: 70, 73].
+* The 4-Number Match tier receives 35% of the pool[cite: 70].
+* The 3-Number Match tier receives 25% of the pool[cite: 70].
+* Prizes must be split equally among multiple winners within the same tier[cite: 72].
+
+3.5 Charity System
+* Users must be able to select a charity at signup[cite: 76].
+* The system must allocate a minimum contribution of 10% of the subscription fee to the selected charity[cite: 77].
+* Users must be able to voluntarily increase their charity contribution percentage[cite: 78].
+* The system must offer an independent donation option that is not tied to gameplay[cite: 79].
+* The platform must include a charity directory featuring a listing page with search and filter capabilities[cite: 81].
+* Individual charity profiles must display descriptions, images, and upcoming events[cite: 82].
+* The homepage must feature a spotlight/featured charity section[cite: 83].
+
+3.6 Winner Verification System
+* The verification process applies exclusively to winners[cite: 85].
+* Winners must upload a screenshot of their scores from the golf platform as proof[cite: 85].
+* Administrators must be able to review submissions to either Approve or Reject them[cite: 85].
+* The system must track payment states, specifically transitioning from Pending to Paid[cite: 85].
+
+3.7 User Dashboard Interface
+* The dashboard must display subscription status (active, inactive, renewal date)[cite: 89].
+* It must include an interface to enter and edit scores[cite: 90].
+* It must display the user's selected charity and their contribution percentage[cite: 91].
+* It must provide a participation summary showing entered draws and upcoming draws[cite: 92].
+* It must provide a winnings overview detailing total amounts won and current payment statuses[cite: 96].
+
+3.8 Admin Dashboard Interface
+* Must include User Management to view/edit profiles, edit golf scores, and manage subscriptions [cite: 98-101].
+* Must include Draw Management to configure logic, run simulations, and publish results [cite: 102-105].
+* Must include Charity Management to add, edit, delete charities and manage their content/media [cite: 106-108].
+* Must include Winners Management to view the winners list, verify submissions, and mark payouts as completed [cite: 109-112].
+* Must include Reports & Analytics for total users, total prize pool, charity contribution totals, and draw statistics [cite: 113-117].
+
+4. NON-FUNCTIONAL REQUIREMENTS
+4.1 UI/UX Design
+* The design must be emotion-driven and lead with charitable impact rather than sport[cite: 120].
+* The interface must be clean, modern, and motion-enhanced[cite: 121].
+* The design must deliberately avoid traditional golf aesthetics and clichés, such as fairways, plaid, and club imagery[cite: 12, 121].
+* The homepage must clearly communicate the user's actions, winning mechanics, charity impact, and include a prominent, persuasive call-to-action (CTA) for subscriptions[cite: 121].
+* The platform must feature subtle transitions and micro-interactions throughout[cite: 121].
+
+4.2 Technical & Performance Requirements
+* The application must feature a mobile-first, fully responsive design[cite: 123].
+* The platform must ensure fast performance with optimized assets and minimal blocking resources[cite: 124].
+* The system must enforce secure authentication using JWT or session-based methods, and HTTPS[cite: 124, 125].
+* The system must support email notifications for system updates, draw results, and winner alerts[cite: 126, 127].
+
+4.3 Scalability
+* The architecture must support multi-country expansion[cite: 133].
+* The system must be extensible to support teams and corporate accounts[cite: 133].
+* The system must include a campaign module ready for future activation[cite: 133].
+* The codebase must be structured to support a future mobile app version[cite: 133].
+
+5. DEPLOYMENT & DELIVERABLES
+* The live website must be fully deployed to a publicly accessible URL via a new Vercel account[cite: 135, 137].
+* The database must be connected using a new Supabase project with a proper schema[cite: 135, 137].
+* Environment variables must be properly configured[cite: 137].
+* The source code must be clean, structured, and well-commented[cite: 135].
+* Test credentials must be provided for functional User and Admin panels[cite: 135].

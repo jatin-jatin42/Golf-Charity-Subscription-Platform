@@ -1,0 +1,94 @@
+.dashboard {
+  padding: var(--space-2xl) 0;
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--bg-base);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.statusBadge {
+  text-align: right;
+}
+
+.subscribePrompt {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.planButtons {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-xl);
+}
+
+.scoresList {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.scoreItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.addScoreForm {
+  background: var(--bg-surface-2);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.drawHistoryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.charityImage {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .subscribePrompt {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .planButtons {
+    width: 100%;
+  }
+  .planButtons button {
+    flex: 1;
+  }
+}

@@ -1,0 +1,43 @@
+.authPage {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-md);
+  background: radial-gradient(circle at 50% 0%, rgba(64, 145, 108, 0.05) 0%, var(--bg-base) 60%);
+}
+
+.authCard {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-xl);
+}
+
+.authHeader {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.errorMessage {
+  background: rgba(230, 57, 70, 0.1);
+  color: var(--color-error);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-md);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+}
+
+.authFooter {
+  text-align: center;
+  margin-top: var(--space-xl);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}

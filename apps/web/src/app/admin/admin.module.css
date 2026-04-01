@@ -1,0 +1,51 @@
+.adminPage {
+  padding: var(--space-2xl) 0;
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--bg-base);
+}
+
+.header {
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.drawsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.drawRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  align-items: center;
+  gap: var(--space-lg);
+  background: var(--bg-surface-2);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.drawActions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+@media (max-width: 1024px) {
+  .kpiGrid { grid-template-columns: repeat(2, 1fr); }
+  .drawRow { grid-template-columns: 1fr; text-align: left; }
+  .drawRow .text-right { text-align: left; }
+  .drawActions { justify-content: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .kpiGrid { grid-template-columns: 1fr; }
+}
