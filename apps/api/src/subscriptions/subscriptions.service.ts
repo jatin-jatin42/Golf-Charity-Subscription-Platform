@@ -62,7 +62,7 @@ export class SubscriptionsService {
       const order = await this.razorpay.orders.create({
         amount: planConfig.amount,
         currency: planConfig.currency,
-        receipt: `sub_${userId}_${Date.now()}`,
+        receipt: `sub_${userId.slice(-8)}_${Date.now().toString().slice(-10)}`,
         notes: {
           userId,
           plan,
