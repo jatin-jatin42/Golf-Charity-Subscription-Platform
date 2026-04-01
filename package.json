@@ -1,9 +1,10 @@
 {
   "name": "golf-charity-platform",
   "private": true,
+  "packageManager": "npm@10.2.4",
   "workspaces": ["apps/*"],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev & sleep 6 && echo '' && echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' && echo '  ⛳  Golf Charity Platform — Running!' && echo '' && echo '  📱  Frontend :  http://localhost:3000' && echo '  🔌  API       :  http://localhost:3001/api' && echo '  📚  API Docs  :  http://localhost:3001/api/docs' && echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' && echo '' && wait",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "db:generate": "turbo run db:generate",
