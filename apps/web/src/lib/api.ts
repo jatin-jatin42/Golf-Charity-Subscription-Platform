@@ -49,9 +49,15 @@ export const api = {
 
   // ── Subscriptions ───────────────────────────────────────────
   subscriptions: {
-    status: ()                         => request('/subscriptions/status'),
-    checkout: (plan: string)           => request('/subscriptions/checkout', { method: 'POST', body: JSON.stringify({ plan }) }),
-    cancel: ()                         => request('/subscriptions/cancel', { method: 'DELETE' }),
+    status: ()                              => request('/subscriptions/status'),
+    createOrder: (plan: string)             => request('/subscriptions/create-order', { method: 'POST', body: JSON.stringify({ plan }) }),
+    verify: (data: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      plan: string;
+    })                                      => request('/subscriptions/verify', { method: 'POST', body: JSON.stringify(data) }),
+    cancel: ()                              => request('/subscriptions/cancel', { method: 'DELETE' }),
   },
 
   // ── Scores ──────────────────────────────────────────────────

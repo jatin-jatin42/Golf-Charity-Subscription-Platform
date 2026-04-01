@@ -76,8 +76,9 @@ export class AuthService {
             id: true,
             plan: true,
             status: true,
-            renewalDate: true,
-            totalAmount: true,
+            currentPeriodEnd: true,
+            prizePoolShare: true,
+            charityShare: true,
           },
         },
         charity: {

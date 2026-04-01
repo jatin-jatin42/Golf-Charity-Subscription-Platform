@@ -105,20 +105,18 @@ async function main() {
     },
   });
 
-  // Test user subscription (simulated — no real Stripe in seed)
+  // Test user subscription (simulated — no real payment in seed)
   await prisma.subscription.upsert({
     where: { userId: testUser.id },
     update: {},
     create: {
       userId: testUser.id,
-      stripeCustomerId: 'cus_test_123',
-      stripeSubId: 'sub_test_123',
       plan: 'MONTHLY',
       status: 'ACTIVE',
-      renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      totalAmount: 20,
-      prizeAmount: 10,
-      charityAmount: 3,
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      prizePoolShare: 1000,  // ₹1000 to prize pool (50% of ₹2000)
+      charityShare: 300,     // ₹300 to charity (15% of ₹2000)
     },
   });
 

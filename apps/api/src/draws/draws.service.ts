@@ -65,9 +65,9 @@ export class DrawsService {
     // Calculate prize pool from active subscriptions
     const activeSubs = await this.prisma.subscription.findMany({
       where: { status: 'ACTIVE' },
-      select: { prizeAmount: true },
+      select: { prizePoolShare: true },
     });
-    const prizePool = activeSubs.reduce((sum, s) => sum + s.prizeAmount, 0);
+    const prizePool = activeSubs.reduce((sum, s) => sum + s.prizePoolShare, 0);
 
     // Check for unclaimed jackpot from previous draw
     const lastDraw = await this.prisma.draw.findFirst({

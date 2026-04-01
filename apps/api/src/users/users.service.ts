@@ -11,7 +11,7 @@ export class UsersService {
       select: {
         id: true, name: true, email: true, role: true,
         charityPercent: true, country: true, createdAt: true,
-        subscription: { select: { plan: true, status: true, renewalDate: true } },
+        subscription: { select: { plan: true, status: true, currentPeriodEnd: true } },
         charity: { select: { id: true, name: true } },
         _count: { select: { scores: true, drawEntries: true } },
       },

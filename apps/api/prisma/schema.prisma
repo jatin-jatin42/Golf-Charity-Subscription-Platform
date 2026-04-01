@@ -83,22 +83,21 @@ model User {
 }
 
 model Subscription {
-  id               String    @id @default(cuid())
-  userId           String    @unique
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stripeCustomerId String
-  stripeSubId      String    @unique
-  plan             Plan
-  status           SubStatus @default(ACTIVE)
-  renewalDate      DateTime
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  razorpayOrderId     String?
+  razorpayPaymentId   String?   @unique
+  plan                Plan
+  status              SubStatus @default(ACTIVE)
+  currentPeriodStart  DateTime  @default(now())
+  currentPeriodEnd    DateTime?
   // Financial breakdown per billing cycle
-  totalAmount      Float
-  prizeAmount      Float     // portion going to prize pool
-  charityAmount    Float     // portion going to charity
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  prizePoolShare      Float     @default(0) // 50% of subscription → prize pool
+  charityShare        Float     @default(0) // 10%+ of subscription → charity
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  @@index([stripeCustomerId])
   @@index([status])
 }
 

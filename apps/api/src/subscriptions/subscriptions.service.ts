@@ -1,158 +1,179 @@
 import {
   Injectable,
   BadRequestException,
-  NotFoundException,
+  InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Stripe from 'stripe';
 import { PrismaService } from '../prisma/prisma.service';
+import Razorpay from 'razorpay';
+import * as crypto from 'crypto';
 
-// Prize pool contribution rate per subscription
-const PRIZE_POOL_RATE = 0.5;   // 50% of subscription goes to prize pool
-const CHARITY_MIN_RATE = 0.1;  // 10% minimum to charity
+// Monthly plan: £20 = 2000 pence → Razorpay uses paise (INR) or smallest unit
+// For demo in INR: £20 ≈ ₹2100 , £180 ≈ ₹18900
+// Razorpay amount is in paise (1 INR = 100 paise)
+const PLANS = {
+  MONTHLY: {
+    amount: 2000 * 100, // 2000 INR in paise (represents £20)
+    currency: 'INR',
+    period: 'monthly',
+    interval: 1,
+    description: 'Golf Charity Monthly Subscription - ₹2000/month',
+  },
+  YEARLY: {
+    amount: 18000 * 100, // 18000 INR in paise (represents £180)
+    currency: 'INR',
+    period: 'yearly',
+    interval: 1,
+    description: 'Golf Charity Yearly Subscription - ₹18000/year (Best Value)',
+  },
+};
 
 @Injectable()
 export class SubscriptionsService {
-  private stripe: Stripe;
+  private readonly logger = new Logger(SubscriptionsService.name);
+  private razorpay: Razorpay;
 
   constructor(
     private prisma: PrismaService,
     private config: ConfigService,
   ) {
-    this.stripe = new Stripe(config.get<string>('STRIPE_SECRET_KEY'), {
-      apiVersion: '2023-10-16',
+    this.razorpay = new Razorpay({
+      key_id: this.config.get('RAZORPAY_KEY_ID'),
+      key_secret: this.config.get('RAZORPAY_KEY_SECRET'),
     });
   }
 
-  /** Create Stripe Checkout Session */
-  async createCheckout(userId: string, plan: 'MONTHLY' | 'YEARLY') {
+  /**
+   * Creates a Razorpay Order for the client to initiate checkout
+   */
+  async createOrder(userId: string, plan: 'MONTHLY' | 'YEARLY') {
+    const planConfig = PLANS[plan];
+    if (!planConfig) {
+      throw new BadRequestException(`Invalid plan: ${plan}`);
+    }
+
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new NotFoundException('User not found');
-
-    const priceId =
-      plan === 'MONTHLY'
-        ? this.config.get<string>('STRIPE_MONTHLY_PRICE_ID')
-        : this.config.get<string>('STRIPE_YEARLY_PRICE_ID');
-
-    const session = await this.stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      customer_email: user.email,
-      line_items: [{ price: priceId, quantity: 1 }],
-      metadata: { userId, plan },
-      success_url: `${this.config.get('CLIENT_URL')}/dashboard?subscription=success`,
-      cancel_url: `${this.config.get('CLIENT_URL')}/pricing?subscription=cancelled`,
-    });
-
-    return { url: session.url };
-  }
-
-  /** Handle Stripe Webhook Events */
-  async handleWebhook(rawBody: Buffer, signature: string) {
-    let event: Stripe.Event;
+    if (!user) throw new BadRequestException('User not found');
 
     try {
-      event = this.stripe.webhooks.constructEvent(
-        rawBody,
-        signature,
-        this.config.get<string>('STRIPE_WEBHOOK_SECRET'),
-      );
-    } catch {
-      throw new BadRequestException('Invalid webhook signature');
-    }
+      const order = await this.razorpay.orders.create({
+        amount: planConfig.amount,
+        currency: planConfig.currency,
+        receipt: `sub_${userId}_${Date.now()}`,
+        notes: {
+          userId,
+          plan,
+          userEmail: user.email,
+          userName: user.name,
+        },
+      });
 
-    switch (event.type) {
-      case 'checkout.session.completed':
-        await this.handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
-        break;
-      case 'customer.subscription.updated':
-        await this.handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
-        break;
-      case 'customer.subscription.deleted':
-        await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-        break;
-      case 'invoice.payment_failed':
-        await this.handlePaymentFailed(event.data.object as Stripe.Invoice);
-        break;
-    }
+      this.logger.log(`Razorpay order created: ${order.id} for user ${userId}, plan: ${plan}`);
 
-    return { received: true };
+      return {
+        orderId: order.id,
+        amount: planConfig.amount,
+        currency: planConfig.currency,
+        keyId: this.config.get('RAZORPAY_KEY_ID'),
+        userName: user.name,
+        userEmail: user.email,
+        description: planConfig.description,
+        plan,
+      };
+    } catch (err) {
+      this.logger.error('Razorpay order creation failed', err);
+      throw new InternalServerErrorException('Could not create payment order. Please try again.');
+    }
   }
 
-  private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-    const { userId, plan } = session.metadata;
-    const subscription = await this.stripe.subscriptions.retrieve(session.subscription as string);
-    const invoice = await this.stripe.invoices.retrieve(subscription.latest_invoice as string);
-    const totalAmount = invoice.amount_paid / 100;
-    const charityRate = 0.1; // default 10%
+  /**
+   * Verifies the Razorpay payment signature and activates the subscription
+   */
+  async verifyAndActivate(
+    userId: string,
+    data: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      plan: 'MONTHLY' | 'YEARLY';
+    },
+  ) {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, plan } = data;
 
-    await this.prisma.subscription.upsert({
+    // Verify signature
+    const keySecret = this.config.get('RAZORPAY_KEY_SECRET');
+    const expectedSig = crypto
+      .createHmac('sha256', keySecret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (expectedSig !== razorpay_signature) {
+      this.logger.warn(`Invalid Razorpay signature for order ${razorpay_order_id}`);
+      throw new BadRequestException('Payment verification failed: Invalid signature');
+    }
+
+    // Calculate dates
+    const now = new Date();
+    const periodEnd = new Date(now);
+    if (plan === 'MONTHLY') {
+      periodEnd.setMonth(periodEnd.getMonth() + 1);
+    } else {
+      periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+    }
+
+    // Calculate prize pool and charity shares
+    const planConfig = PLANS[plan];
+    const totalAmount = planConfig.amount / 100; // Convert from paise back to main unit
+    const prizePoolShare = totalAmount * 0.5;
+    const charityShare = totalAmount * 0.1;
+
+    // Upsert subscription in DB
+    const subscription = await this.prisma.subscription.upsert({
       where: { userId },
+      update: {
+        status: 'ACTIVE',
+        plan,
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        currentPeriodStart: now,
+        currentPeriodEnd: periodEnd,
+        prizePoolShare,
+        charityShare,
+      },
       create: {
         userId,
-        stripeCustomerId: session.customer as string,
-        stripeSubId: subscription.id,
-        plan: plan as any,
         status: 'ACTIVE',
-        renewalDate: new Date(subscription.current_period_end * 1000),
-        totalAmount,
-        prizeAmount: totalAmount * PRIZE_POOL_RATE,
-        charityAmount: totalAmount * charityRate,
-      },
-      update: {
-        stripeSubId: subscription.id,
-        plan: plan as any,
-        status: 'ACTIVE',
-        renewalDate: new Date(subscription.current_period_end * 1000),
-        totalAmount,
-        prizeAmount: totalAmount * PRIZE_POOL_RATE,
-        charityAmount: totalAmount * charityRate,
+        plan,
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        currentPeriodStart: now,
+        currentPeriodEnd: periodEnd,
+        prizePoolShare,
+        charityShare,
       },
     });
-  }
 
-  private async handleSubscriptionUpdated(sub: Stripe.Subscription) {
-    const existing = await this.prisma.subscription.findFirst({
-      where: { stripeSubId: sub.id },
-    });
-    if (!existing) return;
-
-    await this.prisma.subscription.update({
-      where: { id: existing.id },
-      data: {
-        status: sub.status === 'active' ? 'ACTIVE' : 'LAPSED',
-        renewalDate: new Date(sub.current_period_end * 1000),
-      },
-    });
-  }
-
-  private async handleSubscriptionDeleted(sub: Stripe.Subscription) {
-    await this.prisma.subscription.updateMany({
-      where: { stripeSubId: sub.id },
-      data: { status: 'CANCELLED' },
-    });
-  }
-
-  private async handlePaymentFailed(invoice: Stripe.Invoice) {
-    await this.prisma.subscription.updateMany({
-      where: { stripeCustomerId: invoice.customer as string },
-      data: { status: 'LAPSED' },
-    });
+    this.logger.log(`Subscription activated for user ${userId}, plan ${plan}`);
+    return { success: true, subscription };
   }
 
   async getStatus(userId: string) {
-    const sub = await this.prisma.subscription.findUnique({ where: { userId } });
-    return sub || { status: 'NONE' };
+    const sub = await this.prisma.subscription.findUnique({
+      where: { userId },
+    });
+    return sub ?? { status: 'NONE' };
   }
 
-  async cancelSubscription(userId: string) {
+  async cancel(userId: string) {
     const sub = await this.prisma.subscription.findUnique({ where: { userId } });
-    if (!sub) throw new NotFoundException('No active subscription');
+    if (!sub) throw new BadRequestException('No active subscription found');
 
-    await this.stripe.subscriptions.cancel(sub.stripeSubId);
     return this.prisma.subscription.update({
       where: { userId },
-      data: { status: 'CANCELLED' },
+      data: {
+        status: 'CANCELLED',
+      },
     });
   }
 }

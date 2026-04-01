@@ -55,10 +55,49 @@ export default function DashboardPage() {
 
   const handleCheckout = async (plan: string) => {
     try {
-      const res = await api.subscriptions.checkout(plan) as any;
-      window.location.href = res.url;
+      // Step 1: Create order on backend
+      const order = await api.subscriptions.createOrder(plan) as any;
+
+      // Step 2: Load Razorpay SDK and open checkout modal
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        const options = {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'Golf Charity Platform',
+          description: order.description,
+          order_id: order.orderId,
+          prefill: {
+            name: order.userName,
+            email: order.userEmail,
+          },
+          theme: { color: '#40916C' },
+          handler: async (response: any) => {
+            // Step 3: Verify on backend & activate subscription
+            try {
+              await api.subscriptions.verify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                plan,
+              });
+              alert('🎉 Subscription activated successfully! Welcome aboard!');
+              window.location.reload();
+            } catch {
+              alert('Payment received but verification failed. Contact support.');
+            }
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      };
     } catch (err) {
-      alert('Checkout failed. Please try again later.');
+      alert('Could not initiate checkout. Please try again later.');
     }
   };
 

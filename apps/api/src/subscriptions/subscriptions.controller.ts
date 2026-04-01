@@ -1,51 +1,65 @@
 import {
-  Controller, Post, Get, Delete, Body, Headers,
-  UseGuards, RawBodyRequest, Req,
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { IsEnum } from 'class-validator';
 
-class CheckoutDto {
-  @IsEnum(['MONTHLY', 'YEARLY'])
-  plan: 'MONTHLY' | 'YEARLY';
-}
-
-@ApiTags('Subscriptions')
+@ApiTags('subscriptions')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('subscriptions')
 export class SubscriptionsController {
-  constructor(private subscriptionsService: SubscriptionsService) {}
+  constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
-  // Stripe webhook — must be before auth guards (no JWT needed)
-  @Post('webhook')
-  webhook(
-    @Req() req: RawBodyRequest<Request>,
-    @Headers('stripe-signature') signature: string,
+  /**
+   * Step 1: Create a Razorpay order — returns orderId, amount, keyId for the frontend
+   */
+  @Post('create-order')
+  @ApiOperation({ summary: 'Create a Razorpay payment order' })
+  createOrder(
+    @CurrentUser() user: any,
+    @Body() body: { plan: 'MONTHLY' | 'YEARLY' },
   ) {
-    return this.subscriptionsService.handleWebhook(req.rawBody, signature);
+    return this.subscriptionsService.createOrder(user.id, body.plan);
   }
 
-  @Post('checkout')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  createCheckout(@CurrentUser() user: any, @Body() dto: CheckoutDto) {
-    return this.subscriptionsService.createCheckout(user.id, dto.plan);
+  /**
+   * Step 2: Verify Razorpay payment signature and activate subscription
+   */
+  @Post('verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify Razorpay payment and activate subscription' })
+  verifyPayment(
+    @CurrentUser() user: any,
+    @Body()
+    body: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      plan: 'MONTHLY' | 'YEARLY';
+    },
+  ) {
+    return this.subscriptionsService.verifyAndActivate(user.id, body);
   }
 
   @Get('status')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current subscription status' })
   getStatus(@CurrentUser() user: any) {
     return this.subscriptionsService.getStatus(user.id);
   }
 
   @Delete('cancel')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Cancel subscription' })
   cancel(@CurrentUser() user: any) {
-    return this.subscriptionsService.cancelSubscription(user.id);
+    return this.subscriptionsService.cancel(user.id);
   }
 }

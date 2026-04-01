@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) throw new UnauthorizedException('User not found');
 
     // Real-time subscription status check on every authenticated request
-    if (user.subscription && user.subscription.renewalDate < new Date()) {
+    if (user.subscription && user.subscription.currentPeriodEnd && user.subscription.currentPeriodEnd < new Date()) {
       await this.prisma.subscription.update({
         where: { userId: user.id },
         data: { status: 'LAPSED' },

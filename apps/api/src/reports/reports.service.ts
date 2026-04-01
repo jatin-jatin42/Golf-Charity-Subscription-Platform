@@ -27,12 +27,12 @@ export class ReportsService {
     // Total prize pool across all subscriptions
     const prizePoolAggregate = await this.prisma.subscription.aggregate({
       where: { status: 'ACTIVE' },
-      _sum: { prizeAmount: true },
+      _sum: { prizePoolShare: true },
     });
 
     // Total charity contributions
     const charityAggregate = await this.prisma.subscription.aggregate({
-      _sum: { charityAmount: true },
+      _sum: { charityShare: true },
     });
 
     // Draw statistics breakdown
@@ -68,11 +68,11 @@ export class ReportsService {
           totalUsers > 0 ? ((activeSubscribers / totalUsers) * 100).toFixed(1) : 0,
       },
       prizes: {
-        monthlyPool: prizePoolAggregate._sum.prizeAmount || 0,
+        monthlyPool: prizePoolAggregate._sum.prizePoolShare || 0,
         totalPaid: 0, // would aggregate from winner pays
       },
       charity: {
-        totalContributions: charityAggregate._sum.charityAmount || 0,
+        totalContributions: charityAggregate._sum.charityShare || 0,
         totalDonations: totalDonations._sum.amount || 0,
       },
       draws: {
