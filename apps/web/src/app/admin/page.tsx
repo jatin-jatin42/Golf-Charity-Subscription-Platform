@@ -27,7 +27,7 @@ export default function AdminDashboard() {
 
   // Form States
   const [charityForm, setCharityForm] = useState({ name: '', description: '', imageUrl: '', category: '' });
-  const [userForm, setUserForm] = useState({ name: '', charityId: '', charityPercent: 10 });
+  const [userForm, setUserForm] = useState({ name: '', charityId: '', charityPercent: 10, role: 'SUBSCRIBER' });
 
   useEffect(() => {
     if (authLoading) return;
@@ -68,14 +68,20 @@ export default function AdminDashboard() {
     setUserForm({
       name: u.name,
       charityId: u.charityId || '',
-      charityPercent: u.charityPercent || 10
+      charityPercent: u.charityPercent || 10,
+      role: u.role
     });
     setModalType('user');
   };
 
   const handleUpdateUser = async () => {
     try {
-      await api.users.update(selectedItem.id, userForm);
+      // Sanitize: Convert empty string to null for charityId
+      const payload = {
+        ...userForm,
+        charityId: userForm.charityId === '' ? null : userForm.charityId
+      };
+      await api.users.update(selectedItem.id, payload);
       alert('User updated!');
       setModalType(null);
       loadData();
@@ -141,6 +147,16 @@ export default function AdminDashboard() {
     try {
       await api.winners.markPaid(id);
       alert('Payout completed!');
+      loadData();
+    } catch (err: any) { alert(err.message); }
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    if (!confirm('Are you absolutely sure you want to delete this user? This will remove all their scores, subscriptions, and history permanently. This action cannot be undone.')) return;
+    try {
+      await api.users.delete(id);
+      alert('User deleted successfully.');
+      setModalType(null);
       loadData();
     } catch (err: any) { alert(err.message); }
   };
@@ -228,51 +244,56 @@ export default function AdminDashboard() {
 
         {activeTab === 'users' && (
           <div className="animate-fade-up">
-            <div className={styles.tableContainer}>
-              <table className={styles.adminTable}>
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th>Role</th>
-                    <th>Subscription</th>
-                    <th>Charity Support</th>
-                    <th className="text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div className={styles.dataGrid}>
+              <div className={styles.dgTrack}>
+                {/* Header Row */}
+                <div className={`${styles.dgHeader} ${styles.usersGrid}`}>
+                  <div className={styles.dgHeaderCell}>User</div>
+                  <div className={styles.dgHeaderCell}>Role</div>
+                  <div className={styles.dgHeaderCell}>Subscription</div>
+                  <div className={styles.dgHeaderCell}>Charity Support</div>
+                  <div className={`${styles.dgHeaderCell} ${styles.textRight}`}>Actions</div>
+                </div>
+
+                {/* Body Rows */}
+                <div className={styles.dgBody}>
                   {users.map(u => (
-                    <tr key={u.id}>
-                      <td>
+                    <div key={u.id} className={`${styles.dgRow} ${styles.usersGrid}`}>
+                      <div className={styles.dgCell}>
                         <div className={styles.userCell}>
                           <span className="font-bold">{u.name}</span>
                           <span className="email">{u.email}</span>
                         </div>
-                      </td>
-                      <td><span className="badge badge-inactive">{u.role}</span></td>
-                      <td>
+                      </div>
+                      <div className={styles.dgCell}>
+                        <span className="badge badge-inactive">{u.role}</span>
+                      </div>
+                      <div className={styles.dgCell}>
                         {u.subscription ? (
                           <div className={styles.userCell}>
                              <span className="font-semibold text-green">{u.subscription.plan}</span>
-                             <span className="email">Expires: {new Date(u.subscription.currentPeriodEnd).toLocaleDateString()}</span>
+                             <span className="email text-xs">Exp: {new Date(u.subscription.currentPeriodEnd).toLocaleDateString()}</span>
                           </div>
-                        ) : <span className="text-muted italic">None</span>}
-                      </td>
-                      <td>
+                        ) : <span className="text-muted italic text-xs">None</span>}
+                      </div>
+                      <div className={styles.dgCell}>
                         {u.charity ? (
                           <div className={styles.userCell}>
-                             <span>{u.charity.name}</span>
-                             <span className="email">Share: {u.charityPercent}%</span>
+                             <span className="text-sm">{u.charity.name}</span>
+                             <span className="email text-xs">Share: {u.charityPercent}%</span>
                           </div>
-                        ) : 'Not set'}
-                      </td>
-                      <td className={styles.actionsCell}>
-                        <button onClick={() => openUserEdit(u)} className="btn btn-ghost btn-sm">Edit Profile</button>
-                        <button onClick={() => openManageScores(u)} className="btn btn-secondary btn-sm">Manage Scores</button>
-                      </td>
-                    </tr>
+                        ) : <span className="text-muted italic text-xs">Not set</span>}
+                      </div>
+                      <div className={`${styles.dgCell} ${styles.textRight}`}>
+                        <div className={styles.actionsCell}>
+                          <button onClick={() => openUserEdit(u)} className="btn btn-ghost btn-sm">Edit</button>
+                          <button onClick={() => openManageScores(u)} className="btn btn-secondary btn-sm">Scores</button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -283,83 +304,85 @@ export default function AdminDashboard() {
               <h2 className="font-display text-xl font-bold">Supported Organizations</h2>
               <button onClick={() => { setModalType('charity'); setSelectedItem(null); setCharityForm({ name: '', description: '', imageUrl: '', category: '' }); }} className="btn btn-primary btn-sm">+ Add New Charity</button>
             </div>
-            <div className={styles.tableContainer}>
-              <table className={styles.adminTable}>
-                <thead>
-                  <tr>
-                    <th>Name / Image</th>
-                    <th>Subscribers Supporting</th>
-                    <th>Total Raised (EST)</th>
-                    <th className="text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div className={styles.dataGrid}>
+              <div className={styles.dgTrack}>
+                <div className={`${styles.dgHeader} ${styles.charitiesGrid}`}>
+                  <div className={styles.dgHeaderCell}>Organization</div>
+                  <div className={styles.dgHeaderCell}>Supporters</div>
+                  <div className={styles.dgHeaderCell}>Impact (Total)</div>
+                  <div className={`${styles.dgHeaderCell} ${styles.textRight}`}>Actions</div>
+                </div>
+                <div className={styles.dgBody}>
                   {charities.map(c => (
-                    <tr key={c.id}>
-                      <td>
+                    <div key={c.id} className={`${styles.dgRow} ${styles.charitiesGrid}`}>
+                      <div className={styles.dgCell}>
                         <div className="flex items-center gap-sm">
-                           <img src={c.imageUrl || 'https://via.placeholder.com/40'} alt="" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
-                           <span className="font-bold">{c.name}</span>
+                           <img src={c.imageUrl || 'https://via.placeholder.com/40'} alt="" style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover' }} />
+                           <span className="font-bold text-sm">{c.name}</span>
                         </div>
-                      </td>
-                      <td>{c._count?.users || 0} Members</td>
-                      <td className="text-success font-bold font-display">₹{c.totalRaised || 0}</td>
-                      <td className={styles.actionsCell}>
-                        <button onClick={() => { setModalType('charity'); setSelectedItem(c); setCharityForm({ name: c.name, description: c.description, imageUrl: c.imageUrl || '', category: c.category || '' }); }} className="btn btn-ghost btn-sm">Edit</button>
-                        <button onClick={() => { if(confirm('Delete charity?')) api.charities.delete(c.id).then(loadData); }} className="btn btn-danger btn-sm">Delete</button>
-                      </td>
-                    </tr>
+                      </div>
+                      <div className={styles.dgCell}>
+                        <span className="text-sm font-medium">{c._count?.users || 0} Members</span>
+                      </div>
+                      <div className={styles.dgCell}>
+                        <span className="text-success font-bold font-display">₹{c.totalRaised || 0}</span>
+                      </div>
+                      <div className={`${styles.dgCell} ${styles.textRight}`}>
+                        <div className={styles.actionsCell}>
+                          <button onClick={() => { setModalType('charity'); setSelectedItem(c); setCharityForm({ name: c.name, description: c.description, imageUrl: c.imageUrl || '', category: c.category || '' }); }} className="btn btn-ghost btn-sm">Edit</button>
+                          <button onClick={() => { if(confirm('Delete charity?')) api.charities.delete(c.id).then(loadData); }} className="btn btn-danger btn-sm text-xs">Delete</button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === 'winners' && (
           <div className="animate-fade-up">
-            <div className={styles.tableContainer}>
-              <table className={styles.adminTable}>
-                <thead>
-                  <tr>
-                    <th>Winner</th>
-                    <th>Draw Month</th>
-                    <th>Prize Category</th>
-                    <th>Amount</th>
-                    <th>Verification</th>
-                    <th className="text-right">Payment</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div className={styles.dataGrid}>
+              <div className={styles.dgTrack}>
+                <div className={`${styles.dgHeader} ${styles.winnersGrid}`}>
+                  <div className={styles.dgHeaderCell}>Winner</div>
+                  <div className={styles.dgHeaderCell}>Month</div>
+                  <div className={styles.dgHeaderCell}>Tier</div>
+                  <div className={styles.dgHeaderCell}>Amount</div>
+                  <div className={styles.dgHeaderCell}>Verify</div>
+                  <div className={`${styles.dgHeaderCell} ${styles.textRight}`}>Payout</div>
+                </div>
+                <div className={styles.dgBody}>
                   {winners.map(w => (
-                    <tr key={w.id}>
-                      <td className="font-bold">{w.user.name}</td>
-                      <td>{new Date(w.draw.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</td>
-                      <td><span className="badge badge-active">{w.tier}</span></td>
-                      <td className="font-bold gradient-text-gold">₹{w.amount}</td>
-                      <td>
+                    <div key={w.id} className={`${styles.dgRow} ${styles.winnersGrid}`}>
+                      <div className={`${styles.dgCell} font-bold text-sm`}>{w.user.name}</div>
+                      <div className={`${styles.dgCell} text-sm`}>{new Date(w.draw.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
+                      <div className={styles.dgCell}><span className="badge badge-active">{w.tier}</span></div>
+                      <div className={`${styles.dgCell} font-bold text-accent`}>₹{w.amount}</div>
+                      <div className={styles.dgCell}>
                         {w.verifyStatus === 'PENDING' ? (
-                          <button onClick={() => { setModalType('verify'); setSelectedItem(w); }} className="btn btn-secondary btn-sm">Review Proof</button>
+                          <button onClick={() => { setModalType('verify'); setSelectedItem(w); }} className="btn btn-secondary btn-sm text-xs">Verify</button>
                         ) : (
                           <span className={`badge ${w.verifyStatus === 'APPROVED' ? 'badge-published' : 'badge-inactive'}`}>{w.verifyStatus}</span>
                         )}
-                      </td>
-                      <td className="text-right">
+                      </div>
+                      <div className={`${styles.dgCell} ${styles.textRight}`}>
                         {w.payStatus === 'PENDING' ? (
                           <button 
                             disabled={w.verifyStatus !== 'APPROVED'} 
                             onClick={() => handleMarkPaid(w.id)} 
-                            className="btn btn-primary btn-sm"
+                            className="btn btn-primary btn-sm text-xs"
                           >
-                            Mark Paid
+                            Pay
                           </button>
-                        ) : <span className="text-success font-bold">PAID</span>}
-                      </td>
-                    </tr>
+                        ) : <span className="text-success font-bold text-sm">PAID</span>}
+                      </div>
+                    </div>
                   ))}
-                  {winners.length === 0 && <tr><td colSpan={6} className="text-center py-xl text-muted italic">No winners recorded yet.</td></tr>}
-                </tbody>
-              </table>
+                  {winners.length === 0 && <div className="text-center py-xl text-muted italic">No winners recorded yet.</div>}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -384,18 +407,29 @@ export default function AdminDashboard() {
                   <label>Charity Contribution (%)</label>
                   <input type="number" className="form-input" value={userForm.charityPercent} onChange={e => setUserForm({...userForm, charityPercent: Number(e.target.value)})} min={10} max={100} />
                 </div>
-                <div className="form-group">
+                <div className="form-group mb-md">
                   <label>Selected Charity</label>
                   <select className="form-input" value={userForm.charityId} onChange={e => setUserForm({...userForm, charityId: e.target.value})}>
                      <option value="">None / Decide Later</option>
                      {charities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
+                <div className="form-group">
+                  <label>System Role</label>
+                  <select className="form-input" value={userForm.role} onChange={e => setUserForm({...userForm, role: e.target.value})}>
+                     <option value="SUBSCRIBER">SUBSCRIBER</option>
+                     <option value="ADMIN">ADMIN</option>
+                  </select>
+                  <p className="text-xs text-muted mt-sm italic">Note: Admins cannot be deleted. Change role to Subscriber first if removal is required.</p>
+                </div>
              </div>
-             <div className={styles.modalFooter}>
-                <button onClick={() => setModalType(null)} className="btn btn-ghost">Cancel</button>
-                <button onClick={handleUpdateUser} className="btn btn-primary">Save Changes</button>
-             </div>
+              <div className={styles.modalFooter}>
+                 {selectedItem.role !== 'ADMIN' && (
+                   <button onClick={() => handleDeleteUser(selectedItem.id)} className="btn btn-danger btn-sm" style={{ marginRight: 'auto' }}>Delete User</button>
+                 )}
+                 <button onClick={() => setModalType(null)} className="btn btn-ghost">Cancel</button>
+                 <button onClick={handleUpdateUser} className="btn btn-primary">Save Changes</button>
+              </div>
            </div>
         </div>
       )}

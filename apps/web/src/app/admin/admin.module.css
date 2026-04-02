@@ -60,8 +60,8 @@
   margin-bottom: var(--space-2xl);
 }
 
-/* Tables Section */
-.tableContainer {
+/* ── DataGrid Refactor ───────────────────────────── */
+.dataGrid {
   width: 100%;
   overflow-x: auto;
   background: var(--bg-surface-2);
@@ -71,46 +71,75 @@
   box-shadow: var(--shadow-sm);
 }
 
-.adminTable {
-  width: 100%;
-  min-width: 1050px;
-  border-collapse: collapse;
-  table-layout: fixed; /* Enforce column widths */
+.dgTrack {
+  min-width: 1000px; /* Force internal width for scroll */
+  display: block;
 }
 
-.adminTable th {
-  padding: var(--space-md) var(--space-lg);
+.dgHeader {
   background: var(--bg-surface-3);
+  border-bottom: 1px solid var(--border-default);
+  display: grid;
+  align-items: center;
+  padding: 0;
+  height: 56px;
+}
+
+.dgRow {
+  display: grid;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.25s ease;
+  padding: 0;
+  min-height: 80px;
+}
+
+.dgRow:last-child {
+  border-bottom: none;
+}
+
+.dgRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dgCell {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.dgHeaderCell {
+  padding: var(--space-md) var(--space-lg);
   color: var(--text-muted);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border-default);
-  text-align: left;
+  letter-spacing: 0.08em;
 }
 
-/* Explicit Column Widths */
-.adminTable th:nth-child(1) { width: 25%; } /* User */
-.adminTable th:nth-child(2) { width: 12%; } /* Role */
-.adminTable th:nth-child(3) { width: 20%; } /* Subscription */
-.adminTable th:nth-child(4) { width: 20%; } /* Charity */
-.adminTable th:nth-child(5) { width: 23%; text-align: right; } /* Actions */
+/* Tab Specific Grid Proportions */
 
-.adminTable td {
-  padding: var(--space-lg);
-  border-bottom: 1px solid var(--border-subtle);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  vertical-align: middle;
+/* Users: User, Role, Subscription, Charity, Actions */
+.usersGrid {
+  grid-template-columns: 1.5fr 0.7fr 1.25fr 1fr 1fr;
 }
 
-.adminTable tr:last-child td {
-  border-bottom: none;
+/* Charities: Logo/Name, Subs, Raised, Actions */
+.charitiesGrid {
+  grid-template-columns: 1.5fr 1fr 0.8fr 0.7fr;
 }
 
-.adminTable tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+/* Winners: Winner, Month, Tier, Amount, Verification, Payment */
+.winnersGrid {
+  grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr;
+}
+
+.textRight {
+  justify-content: flex-end;
+  text-align: right;
 }
 
 .userCell {
@@ -120,16 +149,17 @@
 }
 
 .userCell .email {
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
-/* Actions */
+/* Actions in Cell */
 .actionsCell {
   display: flex;
   gap: var(--space-sm);
   justify-content: flex-end;
-  align-items: center;
+  width: 100%;
 }
 
 /* Draw Summary logic */

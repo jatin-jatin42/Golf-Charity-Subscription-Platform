@@ -46,6 +46,7 @@ export const api = {
     profile: ()                => request('/users/profile'),
     updateProfile: (data: any) => request('/users/profile', { method: 'PATCH', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id: string)       => request(`/users/${id}`, { method: 'DELETE' }),
   },
 
   // ── Subscriptions ───────────────────────────────────────────

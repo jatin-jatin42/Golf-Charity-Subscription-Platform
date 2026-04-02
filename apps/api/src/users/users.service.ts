@@ -41,8 +41,19 @@ export class UsersService {
         charityId: dto.charityId,
         charityPercent: dto.charityPercent,
         country: dto.country,
+        role: dto.role as any,
       },
-      select: { id: true, name: true, email: true, charityId: true, charityPercent: true },
+      select: { id: true, name: true, email: true, charityId: true, charityPercent: true, role: true },
+    });
+  }
+
+  async delete(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (user?.role === 'ADMIN') {
+      throw new Error('Administrative accounts cannot be deleted for safety reasons.');
+    }
+    return this.prisma.user.delete({
+      where: { id },
     });
   }
 }
