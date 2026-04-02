@@ -205,7 +205,7 @@ export default function AdminDashboard() {
             <div className={styles.kpiGrid}>
               <div className="card card-glow-gold">
                 <p className="text-xs font-bold text-muted uppercase tracking-wider">Monthly Prize Pool</p>
-                <p className="font-display text-3xl font-bold mt-sm gradient-text-gold">₹{overviewData.prizes.monthlyPool}</p>
+                <p className="font-display text-3xl font-bold mt-sm gradient-text-gold">₹{Math.round(overviewData.prizes.monthlyPool)}</p>
                 <p className="text-xs text-secondary mt-xs">50% of subscriptions</p>
               </div>
               <div className="card">
@@ -215,7 +215,7 @@ export default function AdminDashboard() {
               </div>
               <div className="card card-glow-green">
                 <p className="text-xs font-bold text-muted uppercase tracking-wider">Charity Impact</p>
-                <p className="font-display text-3xl font-bold mt-sm text-success">₹{overviewData.charity.totalContributions}</p>
+                <p className="font-display text-3xl font-bold mt-sm text-success">₹{Math.round(overviewData.charity.totalContributions)}</p>
                 <p className="text-xs text-secondary mt-xs">Total fundraising</p>
               </div>
               <div className="card">
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="text-right">
                        <p className="text-xs text-muted uppercase font-semibold">Prize / Jackpot</p>
-                       <p className="font-display font-bold gradient-text-gold">₹{d.prizePool} / ₹{d.jackpotPool}</p>
+                       <p className="font-display font-bold gradient-text-gold">₹{Math.round(d.prizePool)} / ₹{Math.round(d.jackpotPool)}</p>
                     </div>
                     <div className={styles.drawActions}>
                        {d.status === 'PENDING' && <button onClick={() => handleSimulateDraw(d.id)} className="btn btn-secondary btn-sm">Simulate</button>}
@@ -373,7 +373,7 @@ export default function AdminDashboard() {
                         <span className="text-sm font-medium">{c._count?.users || 0} Members</span>
                       </div>
                       <div className={styles.dgCell}>
-                        <span className="text-success font-bold font-display">₹{c.totalRaised || 0}</span>
+                        <span className="text-success font-bold font-display">₹{Math.round(c.totalRaised || 0)}</span>
                       </div>
                       <div className={`${styles.dgCell} ${styles.textRight}`}>
                         <div className={styles.actionsCell}>
@@ -407,7 +407,7 @@ export default function AdminDashboard() {
                       <div className={`${styles.dgCell} font-bold text-sm`}>{w.user.name}</div>
                       <div className={`${styles.dgCell} text-sm`}>{new Date(w.draw.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
                       <div className={styles.dgCell}><span className="badge badge-active">{w.tier}</span></div>
-                      <div className={`${styles.dgCell} font-bold text-accent`}>₹{w.amount}</div>
+                      <div className={`${styles.dgCell} font-bold text-accent`}>₹{Math.round(w.amount)}</div>
                       <div className={styles.dgCell}>
                         {w.verifyStatus === 'PENDING' ? (
                           <button onClick={() => { setModalType('verify'); setSelectedItem(w); }} className="btn btn-secondary btn-sm text-xs">Verify</button>
