@@ -6,19 +6,25 @@ export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
   async getOverview() {
+    // Phase 1: User and Subscription counts (4 total)
     const [
       totalUsers,
       activeSubscribers,
       totalDraws,
       publishedDraws,
-      totalWinners,
-      pendingVerification,
-      totalDonations,
     ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.subscription.count({ where: { status: 'ACTIVE' } }),
       this.prisma.draw.count(),
       this.prisma.draw.count({ where: { status: 'PUBLISHED' } }),
+    ]);
+
+    // Phase 2: Winner counts and Donation aggregates (3 total)
+    const [
+      totalWinners,
+      pendingVerification,
+      totalDonations,
+    ] = await Promise.all([
       this.prisma.winner.count(),
       this.prisma.winner.count({ where: { verifyStatus: 'PENDING' } }),
       this.prisma.donation.aggregate({ _sum: { amount: true } }),

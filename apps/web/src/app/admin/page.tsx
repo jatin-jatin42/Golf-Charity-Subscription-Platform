@@ -41,13 +41,17 @@ export default function AdminDashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [overview, charData, winnersData, usersData] = await Promise.all([
-        api.reports.overview(),
+      // Step 1: Fetch overview first (Most critical for UI render)
+      const overview = await api.reports.overview();
+      setOverviewData(overview);
+
+      // Step 2: Fetch supporting data in a separate batch
+      const [charData, winnersData, usersData] = await Promise.all([
         api.charities.all(),
         api.winners.all(),
         api.users.all(),
       ]);
-      setOverviewData(overview);
+      
       setCharities(charData as any[]);
       setWinners(winnersData as any[]);
       setUsers(usersData as any[]);
@@ -71,7 +75,7 @@ export default function AdminDashboard() {
 
   const handleUpdateUser = async () => {
     try {
-      await api.users.updateProfile(selectedItem.id, userForm);
+      await api.users.update(selectedItem.id, userForm);
       alert('User updated!');
       setModalType(null);
       loadData();

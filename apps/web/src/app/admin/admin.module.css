@@ -68,12 +68,14 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-default);
   margin-top: var(--space-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .adminTable {
   width: 100%;
-  min-width: 1000px;
+  min-width: 1050px;
   border-collapse: collapse;
+  table-layout: fixed; /* Enforce column widths */
 }
 
 .adminTable th {
@@ -85,21 +87,18 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border-default);
+  text-align: left;
 }
 
-/* User Column */
-.adminTable th:nth-child(1), .adminTable td:nth-child(1) { width: 25%; }
-/* Role Column */
-.adminTable th:nth-child(2), .adminTable td:nth-child(2) { width: 12%; }
-/* Subscription Column */
-.adminTable th:nth-child(3), .adminTable td:nth-child(3) { width: 20%; }
-/* Charity Column */
-.adminTable th:nth-child(4), .adminTable td:nth-child(4) { width: 20%; }
-/* Actions Column */
-.adminTable th:nth-child(5), .adminTable td:nth-child(5) { width: 23%; text-align: right; }
+/* Explicit Column Widths */
+.adminTable th:nth-child(1) { width: 25%; } /* User */
+.adminTable th:nth-child(2) { width: 12%; } /* Role */
+.adminTable th:nth-child(3) { width: 20%; } /* Subscription */
+.adminTable th:nth-child(4) { width: 20%; } /* Charity */
+.adminTable th:nth-child(5) { width: 23%; text-align: right; } /* Actions */
 
 .adminTable td {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-lg);
   border-bottom: 1px solid var(--border-subtle);
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -117,6 +116,7 @@
 .userCell {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .userCell .email {
@@ -127,9 +127,9 @@
 /* Actions */
 .actionsCell {
   display: flex;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   justify-content: flex-end;
-  white-space: nowrap;
+  align-items: center;
 }
 
 /* Draw Summary logic */
