@@ -16,6 +16,8 @@ export default function AdminDashboard() {
   // Data States
   const [overviewData, setOverviewData] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
+  const [userMeta, setUserMeta] = useState<any>(null);
+  const [userPage, setUserPage] = useState(1);
   const [charities, setCharities] = useState<any[]>([]);
   const [winners, setWinners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +40,20 @@ export default function AdminDashboard() {
     loadData();
   }, [user, authLoading]);
 
+  useEffect(() => {
+    if (activeTab === 'users') {
+      loadUsers();
+    }
+  }, [userPage]);
+
+  const loadUsers = async () => {
+    try {
+      const res: any = await api.users.all(userPage);
+      setUsers(res.data);
+      setUserMeta(res.meta);
+    } catch (err) { console.error('Failed to load users', err); }
+  };
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -46,15 +62,14 @@ export default function AdminDashboard() {
       setOverviewData(overview);
 
       // Step 2: Fetch supporting data in a separate batch
-      const [charData, winnersData, usersData] = await Promise.all([
+      const [charData, winnersData] = await Promise.all([
         api.charities.all(),
         api.winners.all(),
-        api.users.all(),
       ]);
       
       setCharities(charData as any[]);
       setWinners(winnersData as any[]);
-      setUsers(usersData as any[]);
+      await loadUsers();
     } catch (err) {
       console.error('Failed to load admin data', err);
     } finally {
@@ -294,6 +309,39 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               </div>
+              {/* User Pagination Controls */}
+              {userMeta && userMeta.totalPages > 1 && (
+                <div className="flex justify-between items-center mt-lg bg-surface-2 p-md rounded-lg border border-subtle">
+                  <div className="text-sm text-secondary font-medium">
+                    Showing Page <b className="text-accent">{userPage}</b> of {userMeta.totalPages} ({userMeta.total} Users)
+                  </div>
+                  <div className="flex gap-sm">
+                    <button 
+                      disabled={userPage <= 1} 
+                      onClick={() => setUserPage(prev => prev - 1)} 
+                      className="btn btn-ghost btn-sm"
+                    >
+                      ← Previous
+                    </button>
+                    {[...Array(userMeta.totalPages)].map((_, i) => (
+                      <button 
+                        key={i} 
+                        onClick={() => setUserPage(i + 1)}
+                        className={`btn btn-sm ${userPage === i + 1 ? 'btn-primary' : 'btn-ghost'}`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    <button 
+                      disabled={userPage >= userMeta.totalPages} 
+                      onClick={() => setUserPage(prev => prev + 1)} 
+                      className="btn btn-ghost btn-sm"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
