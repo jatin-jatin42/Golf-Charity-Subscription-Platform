@@ -16,7 +16,7 @@ import { ReportsModule } from './reports/reports.module';
     // ── Config ─────────────────────────────────────────────────
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '../../.env',
     }),
 
     // ── Rate Limiting ───────────────────────────────────────────

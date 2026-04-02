@@ -2,7 +2,9 @@
   "name": "golf-charity-platform",
   "private": true,
   "packageManager": "npm@10.2.4",
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "dev": "turbo run dev & sleep 6 && echo '' && echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' && echo '  ⛳  Golf Charity Platform — Running!' && echo '' && echo '  📱  Frontend :  http://localhost:3000' && echo '  🔌  API       :  http://localhost:3001/api' && echo '  📚  API Docs  :  http://localhost:3001/api/docs' && echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' && echo '' && wait",
     "build": "turbo run build",
@@ -16,6 +18,7 @@
     "docker:logs": "docker compose -f docker-compose.yml logs -f"
   },
   "devDependencies": {
+    "dotenv-cli": "^11.0.0",
     "turbo": "^2.3.3"
   },
   "engines": {
