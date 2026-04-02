@@ -7,13 +7,19 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (authLoading) return;
+
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
     if (user.role !== 'ADMIN') {
       router.push('/dashboard');
       return;
@@ -21,8 +27,8 @@ export default function AdminDashboard() {
 
     api.reports.overview()
       .then(setData)
-      .finally(() => setLoading(false));
-  }, [user, router]);
+      .finally(() => setDataLoading(false));
+  }, [user, authLoading, router]);
 
   const handleSimulateDraw = async (drawId: string) => {
     try {
@@ -45,7 +51,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) return <div className="container mt-3xl text-center"><div className="spinner mx-auto" /></div>;
+  if (authLoading || dataLoading) return <div className="container mt-3xl text-center"><div className="spinner mx-auto" /></div>;
   if (!data) return null;
 
   return (
