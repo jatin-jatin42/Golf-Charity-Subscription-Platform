@@ -311,7 +311,7 @@ export default function AdminDashboard() {
               </div>
               {/* User Pagination Controls */}
               {userMeta && userMeta.totalPages > 1 && (
-                <div className="flex justify-between items-center mt-lg bg-surface-2 p-md rounded-lg border border-subtle">
+                <div className="flex justify-between items-center mt-xl bg-surface-2 p-lg rounded-xl border border-subtle mb-2xl">
                   <div className="text-sm text-secondary font-medium">
                     Showing Page <b className="text-accent">{userPage}</b> of {userMeta.totalPages} ({userMeta.total} Users)
                   </div>

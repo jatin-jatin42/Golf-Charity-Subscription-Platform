@@ -1,7 +1,8 @@
 .adminPage {
-  padding: var(--space-xl) 0 var(--space-3xl);
+  padding: var(--space-xl) 0 var(--space-3xl) !important;
   min-height: calc(100vh - var(--nav-height));
   background: var(--bg-base);
+  padding-bottom: 120px !important; /* Extra space for pagination */
 }
 
 .header {
@@ -208,8 +209,10 @@
   border: 1px solid var(--border-default);
   width: 100%;
   max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Header and footer stay, body scrolls */
   box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
 }
 
@@ -222,7 +225,29 @@
 }
 
 .modalBody {
-  padding: var(--space-lg);
+  padding: var(--space-xl);
+  overflow-y: auto;
+  flex: 1;
+  /* Premium scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+
+.modalBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 10px;
+}
+
+.modalBody::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 .modalFooter {
