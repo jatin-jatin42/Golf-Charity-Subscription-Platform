@@ -204,7 +204,7 @@ export default function AdminDashboard() {
                         {u.subscription ? (
                           <div className={styles.userCell}>
                              <span className="font-semibold text-green">{u.subscription.plan}</span>
-                             <span className="email">Expires: {new Date(u.subscription.endDate).toLocaleDateString()}</span>
+                             <span className="email">Expires: {new Date(u.subscription.renewalDate).toLocaleDateString()}</span>
                           </div>
                         ) : <span className="text-muted italic">None</span>}
                       </td>

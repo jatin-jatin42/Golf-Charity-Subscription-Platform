@@ -67,12 +67,14 @@
   background: var(--bg-surface-2);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-default);
+  margin-top: var(--space-md);
 }
 
 .adminTable {
   width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
-  text-align: left;
+  table-layout: auto;
 }
 
 .adminTable th {
@@ -117,8 +119,10 @@
   display: flex;
   gap: var(--space-xs);
   justify-content: flex-end;
+  white-space: nowrap;
 }
 
+/* Draw Summary logic */
 .drawsList {
   display: flex;
   flex-direction: column;
