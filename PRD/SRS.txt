@@ -1,102 +1,275 @@
-Software Requirements Specification (SRS)
+Digital Heroes PRD-Golf Charity Subscription Platform [cite: 1]
+SAMPLE Selection Process Only digitalheroes.co.in [cite: 2]
+SAMPLE DOCUMENT Issued for Selection Process Only [cite: 3]
+Product Requirements Document (PRD) [cite: 4]
 Project: Golf Charity Subscription Platform [cite: 5]
 
-1. INTRODUCTION
-1.1 Purpose
-This document specifies the software requirements for a subscription-based golf platform that combines performance tracking, monthly prize draws, and charitable giving[cite: 7]. It serves as the single source of truth for the design, development, and evaluation of the system[cite: 9].
-1.2 Background
-This project is a sample assignment issued by Digital Heroes (digitalheroes.co.in) for evaluating full-stack development trainees[cite: 6, 8]. 
+Issued By: Digital Heroes digitalheroes.co.in [cite: 6]
+Document Type: Product Requirements Document (PRD) [cite: 6]
+Purpose: Trainee Selection Process Sample Assignment [cite: 6]
+Version: 1.0 March 2026 [cite: 6]
+Audience: Full-Stack Development Trainees / Applicants [cite: 6]
 
-2. OVERALL DESCRIPTION
-2.1 Product Perspective
-The platform is a subscription-driven web application[cite: 11]. Users subscribe to the platform, enter their latest golf scores in Stableford format, participate in monthly draws, and support a charity with a portion of their subscription[cite: 14, 15].
-2.2 User Roles
-* Public Visitor: Can view the platform concept, explore listed charities, understand draw mechanics, and initiate a subscription [cite: 23-27]. Non-subscribers receive restricted access to platform features[cite: 41].
-* Registered Subscriber: Can manage their profile and settings, enter or edit golf scores, select a charity recipient, view their participation and winnings, and upload winner proof [cite: 28-33].
-* Administrator: Can manage users and subscriptions, configure and run draws, manage charity listings, verify winners and payouts, and access reports and analytics [cite: 34-39].
+Document Summary: This PRD outlines the complete product specification for a subscription-based golf platform combining performance tracking, monthly prize draws, and charitable giving. [cite: 7] It has been prepared by Digital Heroes as a sample assignment document for evaluating full-stack development trainees during the selection process. [cite: 8] It serves as the single source of truth for design, development, and evaluation. [cite: 9]
 
-3. SYSTEM FEATURES (FUNCTIONAL REQUIREMENTS)
-3.1 Subscription & Payment System
-* The system must support Monthly and Yearly (discounted rate) subscription plans[cite: 41].
-* Payments must be processed via Stripe or an equivalent PCI-compliant provider[cite: 41].
-* The system must handle lifecycle states including renewal, cancellation, and lapsed subscriptions[cite: 41].
-* The system must perform a real-time subscription status check on every authenticated request[cite: 41].
+01 PROJECT OVERVIEW [cite: 10]
+The platform is a subscription-driven web application combining golf performance tracking, charity fundraising, and a monthly draw-based reward engine. [cite: 11] It is designed to feel emotionally engaging and modern - deliberately avoiding the aesthetics of a traditional golf website. [cite: 12] Users will: [cite: 13]
+• Subscribe to the platform (monthly or yearly) [cite: 14]
+• Enter their latest golf scores in Stableford format [cite: 14]
+• Participate in monthly draw-based prize pools [cite: 14]
+• Support a charity of their choice with a portion of their subscription [cite: 15]
 
-3.2 Score Management System
-* Users must enter their last 5 golf scores[cite: 44].
-* The valid score range is 1-45 in Stableford format[cite: 45].
-* Each score entry must include a date[cite: 46].
-* The system must retain only the latest 5 scores at any given time[cite: 48].
-* A new score automatically replaces the oldest stored score[cite: 49].
-* Scores must be displayed in reverse chronological order[cite: 50].
+02 CORE OBJECTIVES [cite: 16]
+• Subscription Engine: Build a robust subscription and payment system [cite: 17]
+• Score Experience: Simple, engaging score-entry flow [cite: 17]
+• Custom Draw Engine: Algorithm-powered or random monthly draws [cite: 17]
+• Charity Integration: Seamless charity contribution logic [cite: 17]
+• Admin Control: Comprehensive admin dashboard and tools [cite: 17]
+• Outstanding UI/UX: Design that stands out in the golf industry [cite: 17]
 
-3.3 Draw & Reward System
-* The system must execute draws once per month[cite: 61].
-* Draw mechanics include 5-Number Match, 4-Number Match, and 3-Number Match [cite: 53-55].
-* Draw logic must support both random generation (standard lottery-style) and algorithmic generation (weighted by most/least frequent user scores) [cite: 57-59].
-* Administrators must have access to a simulation/pre-analysis mode before officially publishing draw results[cite: 62, 63].
-* The system must support a jackpot rollover to the next month if there is no 5-match winner[cite: 63].
+Product Requirements Document Golf Charity Subscription Platform [cite: 18]
+Page 1 [cite: 19]
 
-3.4 Prize Pool Logic
-* A pre-defined, automatically enforced portion of each subscription must contribute to the prize pool[cite: 69].
-* The prize pool must be auto-calculated based on the active subscriber count[cite: 71].
-* The 5-Number Match tier receives 40% of the pool and acts as a jackpot that carries forward if unclaimed[cite: 70, 73].
-* The 4-Number Match tier receives 35% of the pool[cite: 70].
-* The 3-Number Match tier receives 25% of the pool[cite: 70].
-* Prizes must be split equally among multiple winners within the same tier[cite: 72].
+---
 
-3.5 Charity System
-* Users must be able to select a charity at signup[cite: 76].
-* The system must allocate a minimum contribution of 10% of the subscription fee to the selected charity[cite: 77].
-* Users must be able to voluntarily increase their charity contribution percentage[cite: 78].
-* The system must offer an independent donation option that is not tied to gameplay[cite: 79].
-* The platform must include a charity directory featuring a listing page with search and filter capabilities[cite: 81].
-* Individual charity profiles must display descriptions, images, and upcoming events[cite: 82].
-* The homepage must feature a spotlight/featured charity section[cite: 83].
+Digital Heroes PRD-Golf Charity Subscription Platform [cite: 20]
+SAMPLE Selection Process Only digitalheroes.co.in [cite: 21]
 
-3.6 Winner Verification System
-* The verification process applies exclusively to winners[cite: 85].
-* Winners must upload a screenshot of their scores from the golf platform as proof[cite: 85].
-* Administrators must be able to review submissions to either Approve or Reject them[cite: 85].
-* The system must track payment states, specifically transitioning from Pending to Paid[cite: 85].
+03 USER ROLES [cite: 22]
+Public Visitor [cite: 23]
+• View platform concept [cite: 24]
+• Explore listed charities [cite: 25]
+• Understand draw mechanics [cite: 26]
+• Initiate subscription [cite: 27]
 
-3.7 User Dashboard Interface
-* The dashboard must display subscription status (active, inactive, renewal date)[cite: 89].
-* It must include an interface to enter and edit scores[cite: 90].
-* It must display the user's selected charity and their contribution percentage[cite: 91].
-* It must provide a participation summary showing entered draws and upcoming draws[cite: 92].
-* It must provide a winnings overview detailing total amounts won and current payment statuses[cite: 96].
+Registered Subscriber [cite: 28]
+• Manage profile & settings [cite: 29]
+• Enter/edit golf scores [cite: 30]
+• Select charity recipient [cite: 31]
+• View participation & winnings [cite: 32]
+• Upload winner proof [cite: 33]
 
-3.8 Admin Dashboard Interface
-* Must include User Management to view/edit profiles, edit golf scores, and manage subscriptions [cite: 98-101].
-* Must include Draw Management to configure logic, run simulations, and publish results [cite: 102-105].
-* Must include Charity Management to add, edit, delete charities and manage their content/media [cite: 106-108].
-* Must include Winners Management to view the winners list, verify submissions, and mark payouts as completed [cite: 109-112].
-* Must include Reports & Analytics for total users, total prize pool, charity contribution totals, and draw statistics [cite: 113-117].
+Administrator [cite: 34]
+• Manage users & subscriptions [cite: 35]
+• Configure & run draws [cite: 36]
+• Manage charity listings [cite: 37]
+• Verify winners & payouts [cite: 38]
+• Access reports & analytics [cite: 39]
 
-4. NON-FUNCTIONAL REQUIREMENTS
-4.1 UI/UX Design
-* The design must be emotion-driven and lead with charitable impact rather than sport[cite: 120].
-* The interface must be clean, modern, and motion-enhanced[cite: 121].
-* The design must deliberately avoid traditional golf aesthetics and clichés, such as fairways, plaid, and club imagery[cite: 12, 121].
-* The homepage must clearly communicate the user's actions, winning mechanics, charity impact, and include a prominent, persuasive call-to-action (CTA) for subscriptions[cite: 121].
-* The platform must feature subtle transitions and micro-interactions throughout[cite: 121].
+04 SUBSCRIPTION & PAYMENT SYSTEM [cite: 40]
+• Plans: Monthly plan and Yearly plan (discounted rate) [cite: 41]
+• Gateway: Stripe (or equivalent PCI-compliant provider) [cite: 41]
+• Access Control: Non-subscribers receive restricted access to platform features [cite: 41]
+• Lifecycle: Handles renewal, cancellation, and lapsed-subscription states [cite: 41]
+• Validation: Real-time subscription status check on every authenticated request [cite: 41]
 
-4.2 Technical & Performance Requirements
-* The application must feature a mobile-first, fully responsive design[cite: 123].
-* The platform must ensure fast performance with optimized assets and minimal blocking resources[cite: 124].
-* The system must enforce secure authentication using JWT or session-based methods, and HTTPS[cite: 124, 125].
-* The system must support email notifications for system updates, draw results, and winner alerts[cite: 126, 127].
+05 SCORE MANAGEMENT SYSTEM [cite: 42]
+Input Requirements [cite: 43]
+• Users must enter their last 5 golf scores [cite: 44]
+• Score range: 1-45 (Stableford format) [cite: 45]
+• Each score must include a date [cite: 46]
 
-4.3 Scalability
-* The architecture must support multi-country expansion[cite: 133].
-* The system must be extensible to support teams and corporate accounts[cite: 133].
-* The system must include a campaign module ready for future activation[cite: 133].
-* The codebase must be structured to support a future mobile app version[cite: 133].
+Functional Behaviour [cite: 47]
+• Only the latest 5 scores are retained at any time [cite: 48]
+• A new score replaces the oldest stored score automatically [cite: 49]
+• Scores are displayed in reverse chronological order (most recent first) [cite: 50]
 
-5. DEPLOYMENT & DELIVERABLES
-* The live website must be fully deployed to a publicly accessible URL via a new Vercel account[cite: 135, 137].
-* The database must be connected using a new Supabase project with a proper schema[cite: 135, 137].
-* Environment variables must be properly configured[cite: 137].
-* The source code must be clean, structured, and well-commented[cite: 135].
-* Test credentials must be provided for functional User and Admin panels[cite: 135].
+06 DRAW & REWARD SYSTEM [cite: 51]
+Draw Types [cite: 52]
+• 5-Number Match [cite: 53]
+• 4-Number Match [cite: 54]
+• 3-Number Match [cite: 55]
+
+Draw Logic Options [cite: 56]
+• Random generation standard lottery-style draw [cite: 57, 58]
+• Algorithmic - weighted by most/least frequent user scores [cite: 59]
+
+Operational Requirements [cite: 60]
+• Monthly cadence draws executed once per month [cite: 61]
+• Admin controls publishing of draw results [cite: 62]
+• Simulation/pre-analysis mode before official publish [cite: 63]
+• Jackpot rollover to next month if no 5-match winner [cite: 63]
+
+Product Requirements Document Golf Charity Subscription Platform [cite: 64]
+Page 2 [cite: 65]
+
+---
+
+Digital Heroes PRD-Golf Charity Subscription Platform [cite: 66]
+SAMPLE Selection Process Only digitalneroes.co.in [cite: 67]
+
+07 PRIZE POOL LOGIC [cite: 68]
+A fixed portion of each subscription contributes to the prize pool. [cite: 69] Distribution is pre-defined and enforced automatically. [cite: 69]
+• 5-Number Match: 40% | Yes (Jackpot) [cite: 70]
+• 4-Number Match: 35% | No [cite: 70]
+• 3-Number Match: 25% | No [cite: 70]
+• Auto-calculation of each pool tier based on active subscriber count [cite: 71]
+• Prizes split equally among multiple winners in the same tier [cite: 72]
+• 5-Match jackpot carries forward if unclaimed [cite: 73]
+
+08 CHARITY SYSTEM [cite: 74]
+Contribution Model [cite: 75]
+• Users select a charity at signup [cite: 76]
+• Minimum contribution: 10% of subscription fee [cite: 77]
+• Users may voluntarily increase their charity percentage [cite: 78]
+• Independent donation option (not tied to gameplay) [cite: 79]
+
+Charity Directory Features [cite: 80]
+• Charity listing page with search and filter [cite: 81]
+• Individual charity profiles: description, images, upcoming events (e.g. golf days) [cite: 82]
+• Featured/spotlight charity section on homepage [cite: 83]
+
+09 WINNER VERIFICATION SYSTEM [cite: 84]
+• Eligibility: Verification process applies to winners only [cite: 85]
+• Proof Upload: Screenshot of scores from the golf platform [cite: 85]
+• Admin Review: Approve or Reject submission [cite: 85]
+• Payment States: Pending → Paid [cite: 85]
+
+10 USER DASHBOARD [cite: 86]
+Must include all of the following: [cite: 87]
+• Subscription status (active / inactive / renewal date) [cite: 88, 89]
+• Score entry and edit interface [cite: 90]
+• Selected charity and contribution percentage [cite: 91]
+• Participation summary (draws entered, upcoming draws) [cite: 92]
+
+Product Requirements Document Golf Charity Subscription Platform [cite: 93]
+Page 3 [cite: 94]
+
+---
+
+Digital Heroes PRD-Golf Charity Subscription Platform [cite: 95]
+• Winnings overview: total won and current payment status [cite: 96]
+
+11 ADMIN DASHBOARD [cite: 97]
+User Management [cite: 98]
+• View and edit user profiles [cite: 99]
+• Edit golf scores [cite: 100]
+• Manage subscriptions [cite: 101]
+
+Draw Management [cite: 102]
+• Configure draw logic (random vs. algorithm) [cite: 103]
+• Run simulations [cite: 104]
+• Publish results [cite: 105]
+
+Charity Management [cite: 106]
+• Add, edit, delete charities [cite: 107]
+• Manage content and media [cite: 108]
+
+Winners Management [cite: 109]
+• View full winners list [cite: 110]
+• Verify submissions [cite: 111]
+• Mark payouts as completed [cite: 112]
+
+Reports & Analytics [cite: 113]
+• Total users [cite: 114]
+• Total prize pool [cite: 115]
+• Charity contribution totals [cite: 116]
+• Draw statistics [cite: 117]
+
+SAMPLE Selection Process Only digitalheroes.co.in [cite: 118]
+
+12 UI/UX REQUIREMENTS [cite: 119]
+The platform must not resemble a traditional golf website. [cite: 120] Design must be emotion-driven - leading with charitable impact, not sport. [cite: 120]
+• Feel: Clean, modern, motion-enhanced interface [cite: 121]
+• Avoid: Golf clichés (fairways, plaid, club imagery as primary design language) [cite: 121]
+• Homepage: Clearly communicates: what the user does, how they win, charity impact, and CTA [cite: 121]
+• Animations: Subtle transitions and micro-interactions throughout [cite: 121]
+• СТА: Subscribe button / flow must be prominent and persuasive [cite: 121]
+
+13 TECHNICAL & ADDITIONAL REQUIREMENTS [cite: 122]
+• Mobile-first, fully responsive design [cite: 123]
+• Fast performance optimised assets, minimal blocking resources JWT or session-based, HTTPS enforced [cite: 124]
+• Secure authentication [cite: 125]
+• Email notifications [cite: 126]
+• system updates, draw results, winner alerts [cite: 127]
+
+Product Requirements Document Golf Charity Subscription Platform [cite: 128]
+Page 4 [cite: 129]
+
+---
+
+Digital Heroes PRD-Golf Charity Subscription Platform [cite: 130]
+SAMPLE Selection Process Only digitalheroes.co.in [cite: 131]
+
+14 SCALABILITY CONSIDERATIONS [cite: 132]
+• Architecture must support multi-country expansion [cite: 133]
+• Extensible to teams / corporate accounts [cite: 133]
+• Campaign module ready for future activation [cite: 133]
+• Codebase structured to support a mobile app version [cite: 133]
+
+15 MANDATORY DELIVERABLES [cite: 134]
+• Live Website: Fully deployed, publicly accessible URL [cite: 135]
+• User Panel: Test credentials; signup/login/score entry/dashboard all functional [cite: 135]
+• Admin Panel: Admin credentials; user management, draw system, charities, winner verification [cite: 135]
+• Database: Backend connected (e.g. Supabase) with proper schema [cite: 135]
+• Source Code: Clean, structured, well-commented codebase [cite: 135]
+
+Deployment Constraints [cite: 136]
+• Deploy to a new Vercel account (not personal/existing) [cite: 137]
+• Use a new Supabase project (not personal/existing) [cite: 137]
+• Environment variables must be properly configured [cite: 137]
+
+16 EVALUATION CRITERIA [cite: 138]
+• Requirements Interpretation: How accurately the team translates requirements into features [cite: 139]
+• System Design: Quality of architecture decisions and data modelling [cite: 139]
+• UI/UX Creativity: Originality, polish, and emotional engagement of the interface [cite: 139]
+• Data Handling: Accuracy of score logic, draw engine, and prize calculations [cite: 139]
+• Scalability Thinking: Extensibility of the codebase and data structures [cite: 139]
+• Problem-Solving: How ambiguous requirements are identified and resolved [cite: 139]
+
+Testing Checklist [cite: 140]
+• User signup & login [cite: 141]
+• Subscription flow (monthly and yearly) [cite: 142]
+• Score entry 5-score rolling logic [cite: 143]
+• Draw system logic and simulation [cite: 144]
+• Charity selection and contribution calculation [cite: 145]
+• Winner verification flow and payout tracking [cite: 146]
+
+Product Requirements Document Golf Charity Subscription Platform [cite: 147]
+Page 5 [cite: 148]
+
+---
+
+Digital Heroes PRD-Golf Charity Subscription Platform [cite: 149]
+SAMPLE Selection Process Only digitalheroes.co.in [cite: 150]
+• User Dashboard all modules functional [cite: 151]
+• Admin Panel - full control and usability [cite: 152]
+• Data accuracy across all modules [cite: 153]
+• Responsive design on mobile and desktop [cite: 154]
+• Error handling and edge cases [cite: 155]
+
+Product Requirements Document Golf Charity Subscription Platform [cite: 156]
+Page 6 [cite: 157]
+
+---
+
+D [cite: 158]
+Digital Heroes [cite: 159]
+Premium Full-Stack Development & Digital Marketing Agency [cite: 160]
+
+Digital Heroes is a premium full-stack development and digital marketing agency led by Shreyansh Singh, founder of Digital Marketing Heroes - a YouTube channel with 2.5M+ subscribers. [cite: 161] Since 2016, the agency has built and scaled 2,000+ brands, generating $10M+ in sales for clients ranging from startups to multi-million dollar businesses. [cite: 162] The team comprises senior developers and UI/UX designers each with 7-10 years of experience, delivering ultra-fast stores (<1.5s load times), Full-Stack / MERN applications, Shopify builds, and enterprise-grade custom platforms. [cite: 163] Every project is backed by a 60-point QA checklist, CRO-driven design principles, and free lifetime support. [cite: 164]
+
+• 2.5M+ YouTube Subscribers [cite: 165]
+• 2,000+ Brands Built [cite: 166]
+• $10M+ Sales Generated [cite: 167]
+• <1.5s Store Load Time [cite: 168]
+• 7-10yr Team Experience [cite: 169]
+
+What We Do [cite: 170]
+• Full-Stack/MERN Development: Custom web applications, APIs, database architecture, cloud deployment [cite: 171]
+• Shopify & WordPress Builds: Premium stores with CRO-optimised layouts and ultra-fast load times [cite: 171]
+• UI/UX & CRO Design: Conversion-focused design backed by $100M+ in split-test data [cite: 171]
+• Brand Incubation (0-to-1): Concept to market strategy, identity, MVP, and growth [cite: 171]
+• Performance Optimisation: Sub-1.5s load times delivering 30-40% conversion boost [cite: 171]
+• Ongoing Support & Scaling: Free lifetime support, security updates, and infrastructure scaling [cite: 171]
+
+Find Us Online [cite: 172]
+• Official Website: https://digitalheroes.co.in [cite: 173]
+• Portfolio: https://portfolio.digitalheroes.co.in [cite: 173]
+• YouTube Channel: https://youtube.com/@DigitalMarketing Heroes [cite: 173]
+• Figma Projects: https://www.figma.com/design/uz7W70LLi2uHDokNAJEaJQ/All-Projects---Demo [cite: 173]
+
+This document was prepared by Digital Heroes as a sample assignment for the Full-Stack Development Trainee Selection Process. [cite: 174] For queries, visit digitalheroes.co.in. [cite: 175]
+
+Product Requirements Document Golf Charity Subscription Platform [cite: 176]
+Page 7 [cite: 177]

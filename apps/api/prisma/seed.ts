@@ -78,12 +78,14 @@ async function main() {
   });
 
   // ── Admin User ────────────────────────────────────────────────
-  const adminPassword = await bcrypt.hash('Admin@1234', 12);
+  const adminPassword = await bcrypt.hash('admin@gc', 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@golfcharity.com' },
-    update: {},
+    where: { email: 'admin@gc.com' },
+    update: {
+      passwordHash: adminPassword,
+    },
     create: {
-      email: 'admin@golfcharity.com',
+      email: 'admin@gc.com',
       name: 'Admin User',
       passwordHash: adminPassword,
       role: 'ADMIN',
@@ -91,12 +93,14 @@ async function main() {
   });
 
   // ── Test Subscriber ────────────────────────────────────────────
-  const userPassword = await bcrypt.hash('User@1234', 12);
+  const userPassword = await bcrypt.hash('12345678', 12);
   const testUser = await prisma.user.upsert({
-    where: { email: 'user@golfcharity.com' },
-    update: {},
+    where: { email: 'user@gc.com' },
+    update: {
+      passwordHash: userPassword,
+    },
     create: {
-      email: 'user@golfcharity.com',
+      email: 'user@gc.com',
       name: 'Test Subscriber',
       passwordHash: userPassword,
       role: 'SUBSCRIBER',
@@ -138,8 +142,8 @@ async function main() {
   console.log('✅ Seed complete!');
   console.log('');
   console.log('📋 Test Credentials:');
-  console.log('  Admin:  admin@golfcharity.com / Admin@1234');
-  console.log('  User:   user@golfcharity.com  / User@1234');
+  console.log('  Admin:  admin@gc.com / admin@gc');
+  console.log('  User:   user@gc.com  / 12345678');
 }
 
 main()
