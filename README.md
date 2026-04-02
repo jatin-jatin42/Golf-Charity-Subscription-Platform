@@ -124,3 +124,4 @@ This repository is optimized for modern cloud deployments.
 1. **Database:** Create a new project on [Supabase](https://supabase.com). Enable Connection Pooling and copy the IPv4 URL. Create a Storage bucket called `proofs`.
 2. **Backend API:** Connect the `apps/api` sub-directory to [Railway](https://railway.app) or Render. It will automatically build utilizing the included `Dockerfile`. Provide all root environment variables to this container.
 3. **Frontend Web:** Connect the `apps/web` sub-directory to [Vercel](https://vercel.com). Ensure you pass the `NEXT_PUBLIC_` environment variables in the Vercel dashboard.
+
