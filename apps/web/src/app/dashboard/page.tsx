@@ -7,16 +7,16 @@ import Link from 'next/link';
 import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
-  const { user, refreshUser } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const [scores, setScores] = useState<any[]>([]);
   const [draws, setDraws] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [scoreValue, setScoreValue] = useState('');
   const [scoreDate, setScoreDate] = useState('');
   const [scoreError, setScoreError] = useState('');
 
   useEffect(() => {
-    if (!user) return;
+    if (authLoading || !user) return;
     Promise.all([
       api.scores.mine(),
       api.draws.myParticipation(),
@@ -25,8 +25,8 @@ export default function DashboardPage() {
         setScores(sData as any[]);
         setDraws(dData as any[]);
       })
-      .finally(() => setLoading(false));
-  }, [user]);
+      .finally(() => setDataLoading(false));
+  }, [user, authLoading]);
 
   const handleAddScore = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,10 +101,18 @@ export default function DashboardPage() {
     }
   };
 
+  if (authLoading || dataLoading) {
+    return (
+      <div className="container mt-3xl text-center">
+        <div className="spinner mx-auto" />
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="container mt-3xl text-center">
-        <h2>Please sign in to view your dashboard.</h2>
+        <h2 className="font-display font-bold">Please sign in to view your dashboard.</h2>
         <Link href="/auth/login" className="btn btn-primary mt-md">Sign In</Link>
       </div>
     );
