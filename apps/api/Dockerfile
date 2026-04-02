@@ -1,5 +1,5 @@
 # ─── Build Stage ──────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -11,8 +11,12 @@ RUN npx prisma generate
 RUN npm run build
 
 # ─── Production Stage ─────────────────────────────────────────
-FROM node:20-alpine AS production
+FROM node:20-slim AS production
 WORKDIR /app
+
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 
 ENV NODE_ENV=production
 
