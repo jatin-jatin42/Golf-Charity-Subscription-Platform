@@ -10,9 +10,9 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "db:generate": "turbo run db:generate",
-    "db:push": "turbo run db:push",
-    "db:migrate": "turbo run db:migrate",
-    "db:seed": "turbo run db:seed",
+    "db:push": "cd apps/api && npx dotenv-cli -e ../../.env -- npx prisma db push --accept-data-loss",
+    "db:seed": "cd apps/api && npx dotenv-cli -e ../../.env -- npm run db:seed",
+    "setup": "npm install && npm run db:push && npm run db:seed",
     "docker:up": "docker compose -f docker-compose.yml up -d",
     "docker:down": "docker compose -f docker-compose.yml down",
     "docker:logs": "docker compose -f docker-compose.yml logs -f"
