@@ -3,7 +3,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install && npm cache clean --force
+# Force install devDependencies (NestJS CLI) because Railway auto-injects NODE_ENV=production
+RUN npm install --include=dev && npm cache clean --force
 
 COPY . .
 RUN npx prisma generate
@@ -26,4 +27,4 @@ RUN npx prisma generate
 
 EXPOSE 3001
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
