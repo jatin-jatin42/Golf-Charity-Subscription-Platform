@@ -57,7 +57,7 @@ export class MailService {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2E7D32;">Congratulations!</h2>
           <p>You are a winner in the <strong>${month}</strong> draw!</p>
-          <p>Your estimated prize pool share is: <strong>£${amount}</strong></p>
+          <p>Your estimated prize pool share is: <strong>₹${amount}</strong></p>
           <br/>
           <p>Please log in to your dashboard to upload your winning proof and claim your prize.</p>
           <br/>

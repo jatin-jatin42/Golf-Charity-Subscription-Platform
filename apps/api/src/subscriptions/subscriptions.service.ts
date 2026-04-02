@@ -10,23 +10,22 @@ import { PrismaService } from '../prisma/prisma.service';
 const Razorpay = require('razorpay');
 import * as crypto from 'crypto';
 
-// Monthly plan: £20 = 2000 pence → Razorpay uses paise (INR) or smallest unit
-// For demo in INR: £20 ≈ ₹2100 , £180 ≈ ₹18900
-// Razorpay amount is in paise (1 INR = 100 paise)
-const PLANS = {
+// Monthly plan: ₹500
+// Yearly plan: ₹4500 (approx 25% discount)
+const PLANS: Record<string, any> = {
   MONTHLY: {
-    amount: 2000 * 100, // 2000 INR in paise (represents £20)
+    amount: 500 * 100, // 500 INR in paise
     currency: 'INR',
     period: 'monthly',
     interval: 1,
-    description: 'Golf Charity Monthly Subscription - ₹2000/month',
+    description: 'Monthly Golf Charity Subscription',
   },
   YEARLY: {
-    amount: 18000 * 100, // 18000 INR in paise (represents £180)
+    amount: 4500 * 100, // 4500 INR in paise
     currency: 'INR',
     period: 'yearly',
     interval: 1,
-    description: 'Golf Charity Yearly Subscription - ₹18000/year (Best Value)',
+    description: 'Yearly Golf Charity Subscription (Save 25%)',
   },
 };
 

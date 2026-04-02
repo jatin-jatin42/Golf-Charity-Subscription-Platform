@@ -1,5 +1,5 @@
 .adminPage {
-  padding: var(--space-2xl) 0;
+  padding: var(--space-xl) 0 var(--space-3xl);
   min-height: calc(100vh - var(--nav-height));
   background: var(--bg-base);
 }
@@ -8,12 +8,115 @@
   margin-bottom: var(--space-2xl);
   padding-bottom: var(--space-xl);
   border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
 }
 
+/* Tabs Navigation */
+.tabsNav {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--space-xs);
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  padding: var(--space-sm) var(--space-lg);
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tabBtn:hover {
+  color: var(--text-secondary);
+}
+
+.tabActive {
+  color: var(--accent-gold);
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  bottom: calc(-1 * var(--space-xs) - 1px);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-green));
+}
+
+/* Overview Section */
 .kpiGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+/* Tables Section */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+}
+
+.adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.adminTable th {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-surface-3);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.adminTable td {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.adminTable tr:last-child td {
+  border-bottom: none;
+}
+
+.adminTable tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.userCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.userCell .email {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Actions */
+.actionsCell {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: flex-end;
 }
 
 .drawsList {
@@ -39,6 +142,53 @@
   justify-content: flex-end;
 }
 
+/* Modal Helper */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-md);
+}
+
+.modalContent {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+}
+
+.modalHeader {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalBody {
+  padding: var(--space-lg);
+}
+
+.modalFooter {
+  padding: var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+}
+
 @media (max-width: 1024px) {
   .kpiGrid { grid-template-columns: repeat(2, 1fr); }
   .drawRow { grid-template-columns: 1fr; text-align: left; }
@@ -48,4 +198,5 @@
 
 @media (max-width: 640px) {
   .kpiGrid { grid-template-columns: 1fr; }
+  .tabsNav { overflow-x: auto; white-space: nowrap; }
 }

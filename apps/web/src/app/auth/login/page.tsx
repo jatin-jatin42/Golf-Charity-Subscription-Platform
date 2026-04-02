@@ -31,7 +31,7 @@ export default function LoginPage() {
       <div className={`card ${styles.authCard}`}>
         <div className={styles.authHeader}>
           <div className="nav-logo" style={{ fontSize: '1.5rem', marginBottom: 'var(--space-md)', justifyContent: 'center' }}>
-            <span style={{ WebkitTextFillColor: 'initial' }}>⛳</span> GolfCharity
+            <span style={{ WebkitTextFillColor: 'initial' }}>⛳</span> Golf Charity
           </div>
           <h1 className="font-display text-2xl font-bold">Welcome Back</h1>
           <p className="text-muted text-sm mt-xs">Sign in to manage your scores and draws</p>

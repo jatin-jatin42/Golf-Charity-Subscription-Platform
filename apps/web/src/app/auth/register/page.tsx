@@ -71,7 +71,7 @@ function RegisterForm() {
       <div className={`card ${styles.authCard}`}>
         <div className={styles.authHeader}>
           <div className="nav-logo" style={{ fontSize: '1.5rem', marginBottom: 'var(--space-md)', justifyContent: 'center' }}>
-            <span style={{ WebkitTextFillColor: 'initial' }}>⛳</span> GolfCharity
+            <span style={{ WebkitTextFillColor: 'initial' }}>⛳</span> Golf Charity
           </div>
           <h1 className="font-display text-2xl font-bold">Create Account</h1>
           <p className="text-muted text-sm mt-xs">

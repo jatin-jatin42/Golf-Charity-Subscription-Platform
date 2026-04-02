@@ -145,8 +145,8 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className={styles.planButtons}>
-               <button onClick={() => handleCheckout('MONTHLY')} className="btn btn-secondary">£20/mo</button>
-               <button onClick={() => handleCheckout('YEARLY')} className="btn btn-primary">£180/yr (Save 25%)</button>
+               <button onClick={() => handleCheckout('MONTHLY')} className="btn btn-secondary">₹500/mo</button>
+               <button onClick={() => handleCheckout('YEARLY')} className="btn btn-primary">₹4500/yr (Save 25%)</button>
             </div>
           </div>
         )}

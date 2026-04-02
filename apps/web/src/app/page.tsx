@@ -7,7 +7,7 @@ import styles from './page.module.css';
 
 // ── Hero Stats ──────────────────────────────────────────────
 const STATS = [
-  { value: '£250K+', label: 'Donated to Charity' },
+  { value: '₹5L+', label: 'Donated to Charity' },
   { value: '4,800+', label: 'Active Members' },
   { value: '36', label: 'Draws Completed' },
   { value: '120+', label: 'Winners Paid Out' },
@@ -74,7 +74,7 @@ const PLANS = [
   {
     id: 'MONTHLY',
     name: 'Monthly',
-    price: '£20',
+    price: '₹500',
     period: '/month',
     features: [
       'Full draw participation',
@@ -89,7 +89,7 @@ const PLANS = [
   {
     id: 'YEARLY',
     name: 'Yearly',
-    price: '£180',
+    price: '₹4500',
     period: '/year',
     badge: 'Best Value — 25% Off',
     features: [
@@ -155,7 +155,7 @@ export default function HomePage() {
               {/* Trust line */}
               <p className={styles.heroTrust}>
                 <span className="glow-dot" style={{ display: 'inline-block' }}></span>
-                &nbsp; Trusted by 4,800+ golfers · £250K+ donated to charity
+                &nbsp; Trusted by 4,800+ golfers · ₹5L+ donated to charity
               </p>
             </div>
 
@@ -176,7 +176,7 @@ export default function HomePage() {
                 <div className={styles.drawCardPrize}>
                   <span className="text-muted text-sm">Current Jackpot</span>
                   <span className="gradient-text-gold font-display" style={{ fontSize: '2rem', fontWeight: 900 }}>
-                    £12,400
+                    ₹75,400
                   </span>
                 </div>
                 <Link href="/auth/register" className="btn btn-primary w-full mt-md">
@@ -395,7 +395,7 @@ export default function HomePage() {
         <div className="container">
           <div className={styles.footerContent}>
             <div>
-              <div className="nav-logo" style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>⛳ GolfCharity</div>
+              <div className="nav-logo" style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>⛳ Golf Charity</div>
               <p className="text-muted text-sm">Play golf. Win prizes. Change lives.</p>
             </div>
             <div className={styles.footerLinks}>

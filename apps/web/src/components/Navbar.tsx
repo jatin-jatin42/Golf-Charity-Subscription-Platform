@@ -15,7 +15,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className={styles.logo}>
           <span className={styles.logoIcon}>⛳</span>
-          <span>GolfCharity</span>
+          <span>Golf Charity</span>
         </Link>
 
         {/* Desktop Nav Links */}
