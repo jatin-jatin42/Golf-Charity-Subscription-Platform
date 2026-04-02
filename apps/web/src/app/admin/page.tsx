@@ -21,8 +21,13 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   // Modal States
-  const [modalType, setModalType] = useState<'charity' | 'user' | 'verify' | null>(null);
+  const [modalType, setModalType] = useState<'charity' | 'user' | 'scores' | 'verify' | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [userScores, setUserScores] = useState<any[]>([]);
+
+  // Form States
+  const [charityForm, setCharityForm] = useState({ name: '', description: '', imageUrl: '', category: '' });
+  const [userForm, setUserForm] = useState({ name: '', charityId: '', charityPercent: 10 });
 
   useEffect(() => {
     if (authLoading) return;
@@ -53,7 +58,55 @@ export default function AdminDashboard() {
     }
   };
 
-  // ── Actions ──────────────────────────────────────────────────
+  // ── Handlers ──────────────────────────────────────────────────
+  const openUserEdit = (u: any) => {
+    setSelectedItem(u);
+    setUserForm({
+      name: u.name,
+      charityId: u.charityId || '',
+      charityPercent: u.charityPercent || 10
+    });
+    setModalType('user');
+  };
+
+  const handleUpdateUser = async () => {
+    try {
+      await api.users.updateProfile(selectedItem.id, userForm);
+      alert('User updated!');
+      setModalType(null);
+      loadData();
+    } catch (err: any) { alert(err.message); }
+  };
+
+  const openManageScores = async (u: any) => {
+    setSelectedItem(u);
+    try {
+      const scores = await api.scores.adminGet(u.id) as any[];
+      setUserScores(scores);
+      setModalType('scores');
+    } catch (err: any) { alert('Failed to load scores: ' + err.message); }
+  };
+
+  const handleUpdateScore = async (scoreId: string, newValue: number) => {
+    try {
+      await api.scores.adminUpdate(scoreId, { value: newValue });
+      const updated = await api.scores.adminGet(selectedItem.id) as any[];
+      setUserScores(updated);
+    } catch (err: any) { alert(err.message); }
+  };
+
+  const handleCreateCharity = async () => {
+    try {
+      if (selectedItem) {
+        await api.charities.update(selectedItem.id, charityForm);
+      } else {
+        await api.charities.create(charityForm);
+      }
+      setModalType(null);
+      loadData();
+    } catch (err: any) { alert(err.message); }
+  };
+
   const handleSimulateDraw = async (id: string) => {
     try {
       await api.draws.simulate(id);
@@ -84,14 +137,6 @@ export default function AdminDashboard() {
     try {
       await api.winners.markPaid(id);
       alert('Payout completed!');
-      loadData();
-    } catch (err: any) { alert(err.message); }
-  };
-
-  const handleDeleteCharity = async (id: string) => {
-    if (!confirm('Delete this charity?')) return;
-    try {
-      await api.charities.delete(id);
       loadData();
     } catch (err: any) { alert(err.message); }
   };
@@ -204,7 +249,7 @@ export default function AdminDashboard() {
                         {u.subscription ? (
                           <div className={styles.userCell}>
                              <span className="font-semibold text-green">{u.subscription.plan}</span>
-                             <span className="email">Expires: {new Date(u.subscription.renewalDate).toLocaleDateString()}</span>
+                             <span className="email">Expires: {new Date(u.subscription.currentPeriodEnd).toLocaleDateString()}</span>
                           </div>
                         ) : <span className="text-muted italic">None</span>}
                       </td>
@@ -217,8 +262,8 @@ export default function AdminDashboard() {
                         ) : 'Not set'}
                       </td>
                       <td className={styles.actionsCell}>
-                        <button className="btn btn-ghost btn-sm">Edit Profile</button>
-                        <button className="btn btn-secondary btn-sm">Manage Scores</button>
+                        <button onClick={() => openUserEdit(u)} className="btn btn-ghost btn-sm">Edit Profile</button>
+                        <button onClick={() => openManageScores(u)} className="btn btn-secondary btn-sm">Manage Scores</button>
                       </td>
                     </tr>
                   ))}
@@ -232,7 +277,7 @@ export default function AdminDashboard() {
           <div className="animate-fade-up">
             <div className="flex justify-between items-center mb-md">
               <h2 className="font-display text-xl font-bold">Supported Organizations</h2>
-              <button onClick={() => { setModalType('charity'); setSelectedItem(null); }} className="btn btn-primary btn-sm">+ Add New Charity</button>
+              <button onClick={() => { setModalType('charity'); setSelectedItem(null); setCharityForm({ name: '', description: '', imageUrl: '', category: '' }); }} className="btn btn-primary btn-sm">+ Add New Charity</button>
             </div>
             <div className={styles.tableContainer}>
               <table className={styles.adminTable}>
@@ -256,8 +301,8 @@ export default function AdminDashboard() {
                       <td>{c._count?.users || 0} Members</td>
                       <td className="text-success font-bold font-display">₹{c.totalRaised || 0}</td>
                       <td className={styles.actionsCell}>
-                        <button className="btn btn-ghost btn-sm">Edit</button>
-                        <button onClick={() => handleDeleteCharity(c.id)} className="btn btn-danger btn-sm">Delete</button>
+                        <button onClick={() => { setModalType('charity'); setSelectedItem(c); setCharityForm({ name: c.name, description: c.description, imageUrl: c.imageUrl || '', category: c.category || '' }); }} className="btn btn-ghost btn-sm">Edit</button>
+                        <button onClick={() => { if(confirm('Delete charity?')) api.charities.delete(c.id).then(loadData); }} className="btn btn-danger btn-sm">Delete</button>
                       </td>
                     </tr>
                   ))}
@@ -286,7 +331,7 @@ export default function AdminDashboard() {
                     <tr key={w.id}>
                       <td className="font-bold">{w.user.name}</td>
                       <td>{new Date(w.draw.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</td>
-                      <td><span className="badge badge-active">{w.prizeTier} Match</span></td>
+                      <td><span className="badge badge-active">{w.tier}</span></td>
                       <td className="font-bold gradient-text-gold">₹{w.amount}</td>
                       <td>
                         {w.verifyStatus === 'PENDING' ? (
@@ -308,7 +353,7 @@ export default function AdminDashboard() {
                       </td>
                     </tr>
                   ))}
-                  {winners.length === 0 && <tr><td colSpan={6} className="text-center py-xl text-muted italic">No winners recorded in system memory.</td></tr>}
+                  {winners.length === 0 && <tr><td colSpan={6} className="text-center py-xl text-muted italic">No winners recorded yet.</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -319,6 +364,106 @@ export default function AdminDashboard() {
 
       {/* ── Modals ─────────────────────────────────────────── */}
       
+      {modalType === 'user' && selectedItem && (
+        <div className={styles.modalOverlay}>
+           <div className={styles.modalContent}>
+             <div className={styles.modalHeader}>
+               <h3 className="font-bold">Edit User: {selectedItem.email}</h3>
+               <button onClick={() => setModalType(null)} className="btn btn-ghost">✕</button>
+             </div>
+             <div className={styles.modalBody}>
+                <div className="form-group mb-md">
+                  <label>Full Name</label>
+                  <input type="text" className="form-input" value={userForm.name} onChange={e => setUserForm({...userForm, name: e.target.value})} />
+                </div>
+                <div className="form-group mb-md">
+                  <label>Charity Contribution (%)</label>
+                  <input type="number" className="form-input" value={userForm.charityPercent} onChange={e => setUserForm({...userForm, charityPercent: Number(e.target.value)})} min={10} max={100} />
+                </div>
+                <div className="form-group">
+                  <label>Selected Charity</label>
+                  <select className="form-input" value={userForm.charityId} onChange={e => setUserForm({...userForm, charityId: e.target.value})}>
+                     <option value="">None / Decide Later</option>
+                     {charities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+             </div>
+             <div className={styles.modalFooter}>
+                <button onClick={() => setModalType(null)} className="btn btn-ghost">Cancel</button>
+                <button onClick={handleUpdateUser} className="btn btn-primary">Save Changes</button>
+             </div>
+           </div>
+        </div>
+      )}
+
+      {modalType === 'scores' && selectedItem && (
+        <div className={styles.modalOverlay}>
+           <div className={styles.modalContent}>
+             <div className={styles.modalHeader}>
+               <h3 className="font-bold">Latest Scores: {selectedItem.name}</h3>
+               <button onClick={() => setModalType(null)} className="btn btn-ghost">✕</button>
+             </div>
+             <div className={styles.modalBody}>
+                <p className="text-sm text-muted mb-lg">Maintain data integrity by correcting score entries if required.</p>
+                <div className="flex flex-col gap-sm">
+                   {userScores.map((s: any) => (
+                      <div key={s.id} className="flex justify-between items-center bg-surface-2 p-sm rounded-lg border border-subtle">
+                         <span>{new Date(s.date).toLocaleDateString()}</span>
+                         <div className="flex gap-sm">
+                            <input 
+                              type="number" 
+                              className="form-input text-center" 
+                              style={{ width: 60, padding: '0.2rem' }}
+                              defaultValue={s.value}
+                              onBlur={(e) => handleUpdateScore(s.id, Number(e.target.value))}
+                            />
+                            <button onClick={() => api.scores.delete(s.id).then(() => openManageScores(selectedItem))} className="btn btn-ghost btn-sm text-error">✕</button>
+                         </div>
+                      </div>
+                   ))}
+                   {userScores.length === 0 && <p className="text-center py-md italic text-muted">No scores recorded for this user.</p>}
+                </div>
+             </div>
+             <div className={styles.modalFooter}>
+                <button onClick={() => setModalType(null)} className="btn btn-primary">Done</button>
+             </div>
+           </div>
+        </div>
+      )}
+
+      {modalType === 'charity' && (
+        <div className={styles.modalOverlay}>
+           <div className={styles.modalContent}>
+             <div className={styles.modalHeader}>
+               <h3 className="font-bold">{selectedItem ? 'Edit Charity' : 'Add New Charity'}</h3>
+               <button onClick={() => setModalType(null)} className="btn btn-ghost">✕</button>
+             </div>
+             <div className={styles.modalBody}>
+                <div className="form-group mb-md">
+                  <label>Charity Name</label>
+                  <input type="text" className="form-input" value={charityForm.name} onChange={e => setCharityForm({...charityForm, name: e.target.value})} />
+                </div>
+                <div className="form-group mb-md">
+                  <label>Logo URL</label>
+                  <input type="text" className="form-input" value={charityForm.imageUrl} onChange={e => setCharityForm({...charityForm, imageUrl: e.target.value})} />
+                </div>
+                <div className="form-group mb-md">
+                   <label>Category</label>
+                   <input type="text" placeholder="e.g. Health, Education" className="form-input" value={charityForm.category} onChange={e => setCharityForm({...charityForm, category: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea className="form-input" rows={4} value={charityForm.description} onChange={e => setCharityForm({...charityForm, description: e.target.value})} />
+                </div>
+             </div>
+             <div className={styles.modalFooter}>
+                <button onClick={() => setModalType(null)} className="btn btn-ghost">Cancel</button>
+                <button onClick={handleCreateCharity} className="btn btn-primary">{selectedItem ? 'Update' : 'Create'}</button>
+             </div>
+           </div>
+        </div>
+      )}
+
       {modalType === 'verify' && selectedItem && (
         <div className={styles.modalOverlay}>
            <div className={styles.modalContent}>
@@ -328,13 +473,13 @@ export default function AdminDashboard() {
              </div>
              <div className={styles.modalBody}>
                 <p className="text-sm text-muted mb-md">Check the golfer's score card screenshot before approving the payout.</p>
-                {selectedItem.proofImageUrl ? (
-                   <img src={selectedItem.proofImageUrl} alt="Winner Proof" className="w-full rounded-lg border border-default" style={{ maxHeight: 300, objectFit: 'contain' }} />
+                {selectedItem.proofUrl ? (
+                   <img src={selectedItem.proofUrl} alt="Winner Proof" className="w-full rounded-lg border border-default" style={{ maxHeight: 300, objectFit: 'contain' }} />
                 ) : <div className="p-xl bg-surface-3 rounded-lg text-center text-muted italic">No proof uploaded yet.</div>}
              </div>
              <div className={styles.modalFooter}>
                 <button onClick={() => handleVerifyWinner(selectedItem.id, 'REJECTED')} className="btn btn-danger">Reject</button>
-                <button onClick={() => handleVerifyWinner(selectedItem.id, 'APPROVED')} className="btn btn-primary" disabled={!selectedItem.proofImageUrl}>Approve Verification</button>
+                <button onClick={() => handleVerifyWinner(selectedItem.id, 'APPROVED')} className="btn btn-primary" disabled={!selectedItem.proofUrl}>Approve Verification</button>
              </div>
            </div>
         </div>
