@@ -6,17 +6,34 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.user.findMany({
-      select: {
-        id: true, name: true, email: true, role: true,
-        charityPercent: true, country: true, createdAt: true,
-        subscription: { select: { plan: true, status: true, currentPeriodEnd: true } },
-        charity: { select: { id: true, name: true } },
-        _count: { select: { scores: true, drawEntries: true } },
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        skip,
+        take: limit,
+        select: {
+          id: true, name: true, email: true, role: true,
+          charityPercent: true, country: true, createdAt: true,
+          subscription: { select: { plan: true, status: true, currentPeriodEnd: true } },
+          charity: { select: { id: true, name: true } },
+          _count: { select: { scores: true, drawEntries: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count(),
+    ]);
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
   }
 
   async findById(id: string) {

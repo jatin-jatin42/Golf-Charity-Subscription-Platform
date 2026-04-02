@@ -42,7 +42,10 @@ export const api = {
 
   // ── Users ───────────────────────────────────────────────────
   users: {
-    all: ()                    => request('/users'),
+    all: (page: number = 1, limit: number = 10) => {
+      const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
+      return request(`/users?${params.toString()}`);
+    },
     profile: ()                => request('/users/profile'),
     updateProfile: (data: any) => request('/users/profile', { method: 'PATCH', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
